@@ -34,10 +34,10 @@ apps/                browser apps: flashcards, quiz, reader, talk (call mode), d
 portable/            run spoken lessons in ChatGPT voice via a Custom GPT
 tools/               srs.py (FSRS scheduler) · serve.py (local API) · tts.py (neural voices)
 student.example/     template for your data — your real student/ folder is never committed
-.claude/commands/    /start and /session shortcuts for Claude Code users
+.claude/ .cursor/ .opencode/ .gemini/   /start and /session shortcuts per agent
 ```
 
-In Claude Code you can type **/start** and **/session** instead of writing the words.
+**Shortcuts:** in Claude Code, Cursor, OpenCode and Gemini CLI you can type **/start** and **/session**. In any other agent (Codex, Cowork, …) just say the words — **"let's start"** and **"session"** work everywhere, because `AGENTS.md` defines them.
 
 ## Privacy
 
