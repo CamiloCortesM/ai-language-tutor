@@ -16,6 +16,17 @@ Every `unit-NN.md` contains: **can-do goal** · **grammar focus** (short explana
 
 Units are **target-language-only**. The tutor generates translations, hints and contrastive notes in each learner's native language at runtime (see AGENTS.md language policy).
 
+## Time expectations (be honest with the learner)
+
+Cumulative guided hours ÷ daily minutes = realistic calendar. At 40 min/day, every day: A2 in ~10 months, **B2 in ~2.5 years** (the practical-fluency milestone most learners actually want), C1 in ~3 years. Passive input on top (series, podcasts) speeds this up; skipped days slow it down more than short sessions do. Never promise faster.
+
+## After C1 — graduation
+
+Passing the C1 exam simulation triggers three things:
+1. **Point at the real exam** — the learner is ready for Cambridge C1 Advanced or IELTS if they need the certificate.
+2. **Maintenance mode** — SRS reviews continue (minutes/day; intervals are months by now) and sessions become free conversation and real-world content. The tutor stops teaching and starts accompanying: unused languages rust.
+3. **Offer the next language** — the whole system restarts for a new target (`activities/generate-language.md`), with the habit already built.
+
 ## Progression rules
 
 - A unit is "done" when its material was used across the strands (not just read) and its checkpoint quiz scores ≥70%.
