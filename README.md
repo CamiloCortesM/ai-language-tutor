@@ -1,56 +1,76 @@
 # AI Language Tutor
 
-Turn any AI coding agent (Claude Code, Codex, Cursor…) into a personal language tutor with memory. CEFR-based curriculum from A1 to C1, spaced repetition, real speaking practice, and progress that persists between sessions — all in plain files, no accounts, no servers.
+Turn any AI coding agent into a personal language tutor with memory — a full CEFR course from A1 to C1 that lives in a folder.
 
-**Status: work in progress.** The English curriculum (A1→C1, 60 units) ships first — and it works **from any native language**: the tutor explains, hints and translates in yours. Want to learn a different language? Ask your tutor — it will offer to generate that curriculum for you in place (and you can contribute it back).
+No accounts, no subscriptions, no servers. The **agent is the tutor** (it teaches, corrects, converses and examines you), **plain files are the memory** (your level, errors, vocabulary and streak persist between sessions), and **one small script is the clock** (FSRS spaced repetition, the modern Anki algorithm). Everything is built on evidence-based language pedagogy — see [`docs/methodology.md`](docs/methodology.md).
+
+Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anything that reads `AGENTS.md`. macOS, Windows and Linux.
+
+## Features
+
+- **Placement test** — a friendly ~15-minute adaptive chat that finds your real CEFR level and builds your profile. No preparation needed.
+- **Daily sessions** — one word (`session`) plans your day: spaced review, comprehensible reading, conversation, writing, pronunciation… balanced across the week and fitted to the minutes you have.
+- **Real curriculum** — 60 CEFR units for English (A1→C1): criterial grammar, vocabulary, functions and Cambridge-style level exams.
+- **Spaced repetition** — cloze flashcards in context, scheduled with FSRS, generated from *your* errors and readings.
+- **Speaking that counts** — conversation, fluency drills and spoken exams by voice: your agent's voice mode, the built-in browser call mode, or ChatGPT voice through a Custom GPT bridge.
+- **Browser apps** — flashcards, quizzes, assisted reader with read-along audio, call mode and a progress dashboard. Self-contained HTML, served locally.
+- **Natural voices, free** — neural TTS via edge-tts, no key or account. Paid voices (OpenAI, ElevenLabs) optional, never required.
+- **Any native language, any target** — the tutor explains in *your* language; English ships complete, and other target languages are generated in place on request.
+- **Private by design** — everything runs and stays on your machine.
 
 ## Quick start
 
-1. Clone (or download) this repo.
-2. Open your AI agent in the folder — **no terminal needed**: in the Claude desktop app, open the folder with **Cowork**; or use Claude Code, Codex, Cursor, etc.
-3. Say **"let's start"** — the tutor gives you a **placement test**: a friendly 15-minute chat (a few questions about you, then short tasks that adapt to how you do) that finds your real CEFR level and creates your profile. No studying, no preparation — just answer honestly. From then on, one word runs your daily class: **"session"**.
+> Requirements: an AI coding agent + Python 3. Recommended once: `pip3 install edge-tts` (free neural voices).
 
-Want a language other than English? Just say so — *"I speak Spanish and I want to learn French"* — and the tutor sets it up: it generates the French curriculum right in your copy (level by level, marked as generated), creates your French profile, and teaches you exactly the same way.
+1. Clone or download this repo.
+2. Open your AI agent in the folder — no terminal needed: in the Claude desktop app, open the folder with **Cowork**.
+3. Say **`let's start`** and take the placement test.
 
-## Learning more than one language
+From then on, your daily class is one word: **`session`**. In Claude Code, Cursor, OpenCode and Gemini CLI you can also type `/start` and `/session`.
 
-Yes — each language is fully independent: its own deck, streak, level, error log and progress, in its own folder (`student/english/`, `student/french/`…). Say **"switch to French"** and everything — sessions, flashcards, dashboard — follows. Your profile (name, native language, daily minutes) is shared; nothing else is.
+## How a session works
 
-Requirements: any AI coding agent + Python 3. Works on macOS, Windows and Linux.
+The tutor reads your memory, greets you with your streak and due cards, and runs a plan shaped to your daily minutes — for example: 10' flashcard review → 15' reading at 95–98% known words → 15' spoken roleplay → 5' grammar targeting your most repeated error. Every activity writes back what it learned about you: new errors become flashcards, mastered words unlock harder texts, and tomorrow's class starts where today's ended.
 
-**Recommended — natural voices, free:** run `pip3 install edge-tts` once and every read-aloud — stories, flashcards, dictation — switches from the robotic system voice to free neural voices (no API key, no account). Audio is cached locally. Pick a voice with `TUTOR_TTS_VOICE` (e.g. `en-US-AriaNeural`). Paid alternatives (OpenAI, ElevenLabs) are supported but never required — everything in this project works on free tiers.
+Speaking steps are enforced, not optional — you cannot pass B1 without a spoken exam. When your agent has no voice (Cowork, terminals), the tutor offers:
 
-## How it works
+- **Call mode in the browser** (`apps/talk.html`) — you speak into the mic, the tutor answers aloud with a neural voice.
+- **ChatGPT voice bridge** — the tutor prints a *Lesson Pass*; a Custom GPT ([5-minute setup](portable/chatgpt-voice-tutor.md)) runs the spoken lesson and returns a *Lesson Report* that syncs back into your memory.
 
-- The **agent is the tutor** — it converses, corrects, explains, and examines you, following `AGENTS.md` and the evidence-based method in `docs/methodology.md`.
-- **Files are the memory** — your level, streak, error log, known words and card deck live in `student/` (gitignored, yours).
-- **One small script is the clock** — `tools/srs.py` schedules flashcard reviews with FSRS, the modern Anki algorithm.
-- **Spoken lessons can run anywhere** — your agent's voice mode, the built-in browser call mode (`apps/talk.html`), or ChatGPT voice via a Custom GPT (`portable/chatgpt-voice-tutor.md`): your tutor hands it a Lesson Pass, the GPT runs the class by voice, and its Lesson Report syncs back into your memory.
+## Languages
 
-See `docs/architecture.md` for the full design and `docs/research/` for the evidence behind it.
+- **Learn English today** — complete curriculum, from any native language: hints, translations and explanations are generated in yours.
+- **Learn anything else** — say *"I speak Spanish and I want to learn French"*: the tutor generates the French curriculum in your copy, level by level, and teaches the same way. Generated curricula are marked for review — contribute yours back!
+- **Several at once** — each language keeps its own deck, streak, level and errors in `student/<language>/`. Say *"switch to French"* and everything follows.
 
 ## Repo layout
 
 ```
 AGENTS.md            the tutor's brain — identity, rules, memory protocol
-docs/                methodology (the pedagogical rules) + architecture + research
-activities/          the 11 lesson types the tutor can run (plain markdown)
-languages/english/   curriculum: 60 CEFR units (A1→C1) + notes per native language
-apps/                browser apps: flashcards, quiz, reader, talk (call mode), dashboard
-portable/            run spoken lessons in ChatGPT voice via a Custom GPT
-tools/               srs.py (FSRS scheduler) · serve.py (local API) · tts.py (neural voices)
-student.example/     template for your data — your real student/ folder is never committed
-.claude/ .cursor/ .opencode/ .gemini/   /start and /session shortcuts per agent
+docs/                methodology, architecture, and the research behind them
+activities/          the 12 lesson types the tutor can run (plain markdown)
+languages/english/   curriculum: 60 CEFR units + notes per native language
+apps/                browser apps: flashcards, quiz, reader, talk, dashboard
+portable/            ChatGPT voice bridge (Custom GPT instructions)
+tools/               srs.py (FSRS) · serve.py (local API) · tts.py (voices)
+student.example/     template for your data — your real student/ is gitignored
 ```
-
-**Shortcuts:** in Claude Code, Cursor, OpenCode and Gemini CLI you can type **/start** and **/session**. In any other agent (Codex, Cowork, …) just say the words — **"let's start"** and **"session"** work everywhere, because `AGENTS.md` defines them.
 
 ## Privacy & API keys
 
-Everything runs on your machine. Your profile, errors and progress live in `student/` (gitignored). No accounts, no telemetry, no server beyond `localhost`.
+Your data never leaves your machine: profile, errors and progress live in `student/` (gitignored), and the only server is `localhost`. The default stack needs **zero API keys**. If you opt into a paid voice, pass the key only as an environment variable (`export OPENAI_API_KEY=...`) — never write keys into files in this folder and never paste them into the chat: the agent can read both. Keys are sent only to their provider over HTTPS and never written to disk.
 
-**API keys (all optional):** the default stack needs **zero keys** — free neural voices via edge-tts, free browser speech recognition. If you choose a paid voice (OpenAI/ElevenLabs), provide the key **only as an environment variable** in your shell profile (`export OPENAI_API_KEY=...`). Never write keys into any file inside this folder and never paste them into the chat — anything in the folder or the conversation can be read by the AI agent. The tools only ever send the key to its provider over HTTPS; it is never written to disk, cached, or committed.
+## Contributing
+
+The most valuable contributions, in order:
+
+1. **A language you generated** — `languages/<target>/` from the tutor's generator, reviewed by you.
+2. **L1 notes** — typical errors for your native language (`languages/english/l1-notes/<your-language>.md`).
+3. **Curriculum review** — corrections to units by teachers or advanced learners.
+4. **Windows/Linux testing** — the tooling is cross-platform by design; field reports welcome.
+
+Keep the spirit: plain files, no frameworks, free by default, works in any agent.
 
 ## License
 
-MIT — use it, fork it, translate it, build on it. See `LICENSE`.
+[MIT](LICENSE) — use it, fork it, translate it, build on it.
