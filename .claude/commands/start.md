@@ -1,0 +1,1 @@
+First-time setup. Read AGENTS.md, then follow its "First run" section: copy student.example/ to student/ and run activities/placement-test.md to determine my level and create my profile.

@@ -1,0 +1,71 @@
+/* Shared theme — AI language tutor. Tokens only: no layout classes. */
+:root {
+  --bg: #FAF7F2;
+  --surface: #FFFFFF;
+  --surface-2: #F3EEE6;
+  --ink: #1F1B17;
+  --ink-soft: #5C554C;
+  --ink-faint: #9C948A;
+  --line: #E9E2D8;
+  --accent: #0E9F6E;
+  --accent-strong: #067A54;
+  --accent-soft: #DFF2EA;
+  --on-accent: #FFFFFF;
+  --success: #0E9F6E;
+  --error: #C6432C;
+  --error-soft: #FBE9E4;
+  --warning: #A16B00;
+  --warning-soft: #FBEED8;
+  /* SRS grade scale — fixed across all apps */
+  --again-bg: #FBE9E4;  --again-ink: #A93A22;
+  --hard-bg:  #FBEED8;  --hard-ink:  #8F6300;
+  --good-bg:  #DFF2EA;  --good-ink:  #046B4C;
+  --easy-bg:  #E0EFF9;  --easy-ink:  #0A6A9E;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow-1: 0 1px 2px rgba(60,48,32,.06), 0 2px 8px rgba(60,48,32,.06);
+  --shadow-2: 0 2px 4px rgba(60,48,32,.08), 0 10px 28px rgba(60,48,32,.10);
+  --font-display: "Avenir Next", ui-rounded, "SF Pro Rounded", "Trebuchet MS", system-ui, sans-serif;
+  --font-text: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease: cubic-bezier(.22,.9,.35,1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #221E1A;
+    --surface: #2C2723;
+    --surface-2: #363029;
+    --ink: #F1EBE2;
+    --ink-soft: #BBB1A4;
+    --ink-faint: #857C71;
+    --line: #3E372F;
+    --accent: #22B583;
+    --accent-strong: #4FD3A4;
+    --accent-soft: #1E3A30;
+    --on-accent: #0B241B;
+    --success: #34C795;
+    --error: #F08A73;
+    --error-soft: #46251D;
+    --warning: #E3A93E;
+    --warning-soft: #403114;
+    --again-bg: #46251D;  --again-ink: #FFAD97;
+    --hard-bg:  #403114;  --hard-ink:  #F0C46A;
+    --good-bg:  #1E3A30;  --good-ink:  #6FE0B4;
+    --easy-bg:  #1C3547;  --easy-ink:  #7FC8F2;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.25);
+    --shadow-2: 0 2px 4px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent-strong); }
+a:hover { color: var(--accent); }
+button { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+@keyframes tut-pop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes tut-rise { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutor — Quiz</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand b { font-family: var(--font-display); font-size: 17px; }
+  .brand span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+  .meta { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+  main { flex: 1; width: 100%; max-width: 620px; margin: 0 auto; padding: 24px 16px 40px; box-sizing: border-box; }
+  .dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 26px; }
+  .dots span { width: 9px; height: 9px; border-radius: 50%; background: var(--surface-2); transition: background .2s var(--ease); }
+  .dots .cur { background: var(--ink-soft); }
+  .dots .ok { background: var(--success); }
+  .dots .bad { background: var(--error); }
+  .qcard { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-1); padding: 26px 22px; animation: tut-rise .2s var(--ease); }
+  .qtype { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  .prompt { font-family: var(--font-text); font-size: 22px; line-height: 1.5; margin-bottom: 22px; text-wrap: pretty; }
+  .prompt input { font-family: var(--font-text); font-size: 22px; width: 170px; border: none; border-bottom: 2px solid var(--accent); background: transparent; color: var(--accent-strong); text-align: center; padding: 0 4px; border-radius: 0; }
+  .prompt input.ok { border-color: var(--success); }
+  .prompt input.bad { border-color: var(--error); }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .options button { text-align: left; border: 2px solid var(--line); background: var(--surface); color: var(--ink); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 17px; font-weight: 600; cursor: pointer; min-height: 44px; transition: all .15s var(--ease); }
+  .options button:hover:not(:disabled) { border-color: var(--ink-faint); }
+  .options button.right { border-color: var(--success); background: var(--good-bg); color: var(--good-ink); }
+  .options button.wrong { border-color: var(--error); background: var(--again-bg); color: var(--again-ink); }
+  .placed { min-height: 54px; border-bottom: 2px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 6px 2px; margin-bottom: 16px; }
+  .bank { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: none; font-family: var(--font-text); font-size: 19px; padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; }
+  .placed .chip { background: var(--accent-soft); color: var(--accent-strong); }
+  .bank .chip { background: var(--surface-2); color: var(--ink); box-shadow: var(--shadow-1); }
+  .chip:hover { filter: brightness(.97); }
+  .primary { border: none; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 15px; padding: 12px 26px; border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; }
+  .primary:hover { filter: brightness(1.06); }
+  #check { margin-top: 20px; }
+  .feedback { margin-top: 20px; display: flex; flex-direction: column; gap: 14px; animation: tut-rise .2s var(--ease); }
+  .fb-box { display: flex; gap: 10px; align-items: flex-start; border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; line-height: 1.5; }
+  .fb-box.ok { background: var(--good-bg); color: var(--good-ink); }
+  .fb-box.bad { background: var(--again-bg); color: var(--again-ink); }
+  .fb-box b { flex-shrink: 0; }
+  #next { align-self: flex-end; }
+  .end { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); padding: 36px 28px; text-align: center; animation: tut-rise .25s var(--ease); }
+  .ring { margin-bottom: 8px; }
+  .review { text-align: left; margin: 18px 0 20px; }
+  .rrow { display: flex; gap: 12px; align-items: baseline; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+  .rrow .mark { font-weight: 700; font-size: 15px; width: 16px; flex-shrink: 0; }
+  .rrow .s { font-family: var(--font-text); font-size: 16px; }
+  .rrow .c { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+  .added { font-size: 13px; font-weight: 600; color: var(--ink-soft); background: var(--surface-2); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 20px; display: inline-block; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body style="min-height:100vh;display:flex;flex-direction:column">
+<header>
+  <div class="brand"><b>Tutor</b><span>Quiz</span></div>
+  <div class="meta"><span id="qnum">1</span>/<span id="qtotal">0</span></div>
+</header>
+<main>
+  <div id="quiz">
+    <div class="dots" id="dots" aria-label="Progress"></div>
+    <div class="qcard">
+      <div class="qtype" id="qtype"></div>
+      <div class="prompt" id="prompt"></div>
+      <div class="options hidden" id="options"></div>
+      <div class="hidden" id="reorder">
+        <div class="placed" id="placed" aria-label="Your sentence"></div>
+        <div class="bank" id="bank" aria-label="Word bank"></div>
+      </div>
+      <button class="primary hidden" id="check">Check</button>
+      <div class="feedback hidden" id="feedback">
+        <div class="fb-box" id="fb-box"><b id="fb-mark"></b><span id="fb-text"></span></div>
+        <button class="primary" id="next">Next</button>
+      </div>
+    </div>
+  </div>
+  <div class="end hidden" id="end">
+    <svg class="ring" width="110" height="110" viewBox="0 0 110 110" role="img" aria-label="Score">
+      <circle cx="55" cy="55" r="46" fill="none" stroke="var(--surface-2)" stroke-width="10"></circle>
+      <circle id="ring-fg" cx="55" cy="55" r="46" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" transform="rotate(-90 55 55)"></circle>
+      <text id="ring-num" x="55" y="52" text-anchor="middle" style="font-family:var(--font-display);font-weight:700;font-size:26px" fill="var(--ink)"></text>
+      <text x="55" y="72" text-anchor="middle" style="font-size:11px;font-weight:600" fill="var(--ink-faint)">correct</text>
+    </svg>
+    <div class="review" id="review"></div>
+    <div class="added hidden" id="added"></div>
+    <div><button class="primary" id="close">Done</button></div>
+  </div>
+</main>
+<script>
+(() => {
+  const DEMO = { title: 'Demo quiz', questions: [
+    { type: 'choice', prompt: 'She ___ to work by bus every day.', options: ['goes', 'go', 'is go', 'going'], correct: 0, explain: 'Third-person singular takes -s in the present simple: she goes.' },
+    { type: 'gap', prompt: 'Can I ___ your pen? (pedir prestado)', answers: ['borrow'], explain: '“Borrow” = take something you will give back. You borrow FROM someone; they LEND it to you.' },
+    { type: 'choice', prompt: 'Which word means “embarazada”?', options: ['pregnant', 'embarrassed', 'ashamed', 'nervous'], correct: 0, explain: '“Embarrassed” means avergonzado — a classic false friend.' },
+    { type: 'reorder', words: ['always', 'I', 'coffee', 'drink', 'in', 'the', 'morning'], answer: 'i always drink coffee in the morning', display: 'I always drink coffee in the morning.', explain: 'Frequency adverbs go BEFORE the main verb: I always drink…' },
+    { type: 'choice', prompt: 'It depends ___ the weather.', options: ['on', 'of', 'in', 'from'], correct: 0, explain: 'Depend ON — never “depend of”.' },
+  ]};
+  let quiz = DEMO, i = 0, answered = false, placed = [], results = [], live = false;
+  const $ = id => document.getElementById(id);
+  const esc = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  const primaryAns = q => q.answers ? q.answers[0] : q.answer;
+
+  function renderDots() {
+    $('dots').innerHTML = quiz.questions.map((_, d) => {
+      const cls = d < results.length ? (results[d].correct ? 'ok' : 'bad') : d === i ? 'cur' : '';
+      return `<span class="${cls}"></span>`;
+    }).join('');
+  }
+
+  function render() {
+    const qs = quiz.questions;
+    $('qtotal').textContent = qs.length;
+    if (i >= qs.length) return finish();
+    const q = qs[i];
+    answered = false; placed = [];
+    $('qnum').textContent = i + 1;
+    renderDots();
+    $('feedback').classList.add('hidden'); $('check').classList.add('hidden');
+    $('options').classList.toggle('hidden', q.type !== 'choice');
+    $('reorder').classList.toggle('hidden', q.type !== 'reorder');
+    $('qtype').textContent = q.type === 'choice' ? 'Choose the answer' : q.type === 'gap' ? 'Fill the gap' : 'Put the words in order';
+    if (q.type === 'gap') {
+      const p = q.prompt.split('___');
+      $('prompt').innerHTML = esc(p[0]) + '<input id="gap" aria-label="Type the missing word" autocomplete="off">' + esc(p[1] ?? '');
+      const gap = $('gap');
+      gap.focus();
+      gap.addEventListener('input', () => $('check').classList.toggle('hidden', !gap.value.trim() || answered));
+      gap.addEventListener('keydown', e => { if (e.key === 'Enter' && gap.value.trim() && !answered) checkGap(); });
+    } else if (q.type === 'choice') {
+      $('prompt').textContent = q.prompt;
+      $('options').innerHTML = q.options.map((o, oi) => `<button data-i="${oi}">${esc(o)}</button>`).join('');
+    } else {
+      $('prompt').textContent = '';
+      renderChips();
+    }
+  }
+
+  function renderChips() {
+    const q = quiz.questions[i];
+    $('placed').innerHTML = placed.map((wi, pi) => `<button class="chip" data-p="${pi}">${esc(q.words[wi])}</button>`).join('');
+    $('bank').innerHTML = q.words.map((w, wi) => placed.includes(wi) ? '' : `<button class="chip" data-b="${wi}">${esc(w)}</button>`).join('');
+    $('check').classList.toggle('hidden', placed.length !== q.words.length || answered);
+  }
+
+  function feedback(correct, q) {
+    answered = true;
+    results.push({ q, correct });
+    renderDots();
+    $('check').classList.add('hidden');
+    const box = $('fb-box');
+    box.className = 'fb-box ' + (correct ? 'ok' : 'bad');
+    $('fb-mark').textContent = correct ? '✓' : '✗';
+    const fix = correct ? '' :
+      q.type === 'choice' ? `Correct answer: ${q.options[q.correct]}. ` :
+      q.type === 'gap' ? `Correct answer: ${primaryAns(q)}. ` :
+      `Correct order: ${q.display} `;
+    $('fb-text').textContent = fix + (q.explain || '');
+    $('next').textContent = i + 1 >= quiz.questions.length ? 'See results' : 'Next';
+    $('feedback').classList.remove('hidden');
+  }
+
+  function checkGap() {
+    const q = quiz.questions[i];
+    const val = $('gap').value.trim().toLowerCase();
+    const ok = (q.answers ?? [q.answer]).map(a => a.toLowerCase()).includes(val);
+    $('gap').classList.add(ok ? 'ok' : 'bad');
+    $('gap').disabled = true;
+    feedback(ok, q);
+  }
+
+  $('options').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || answered) return;
+    const q = quiz.questions[i], pick = +b.dataset.i, ok = pick === q.correct;
+    [...$('options').children].forEach((el, oi) => {
+      if (oi === q.correct) el.classList.add('right');
+      else if (oi === pick) el.classList.add('wrong');
+      el.disabled = true;
+    });
+    feedback(ok, q);
+  });
+  $('placed').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || answered) return;
+    placed.splice(+b.dataset.p, 1); renderChips();
+  });
+  $('bank').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || answered) return;
+    placed.push(+b.dataset.b); renderChips();
+  });
+  $('check').addEventListener('click', () => {
+    const q = quiz.questions[i];
+    if (q.type === 'gap') return checkGap();
+    const str = placed.map(wi => q.words[wi]).join(' ').toLowerCase();
+    feedback(str === q.answer.toLowerCase(), q);
+  });
+  $('next').addEventListener('click', () => { i++; render(); });
+  $('close').addEventListener('click', () => window.close());
+
+  async function finish() {
+    $('quiz').classList.add('hidden'); $('end').classList.remove('hidden');
+    const score = results.filter(r => r.correct).length, total = quiz.questions.length;
+    const C = 2 * Math.PI * 46;
+    $('ring-fg').setAttribute('stroke-dasharray', (C * score / total).toFixed(1) + ' ' + C.toFixed(1));
+    $('ring-num').textContent = `${score}/${total}`;
+    $('review').innerHTML = results.map(r => {
+      const s = r.q.type === 'reorder' ? r.q.display : r.q.type === 'gap' ? r.q.prompt.replace('___', primaryAns(r.q)) : r.q.prompt;
+      const c = r.correct ? '' : `<div class="c">→ ${esc(r.q.type === 'choice' ? r.q.options[r.q.correct] + ' — ' + r.q.explain : r.q.explain)}</div>`;
+      return `<div class="rrow"><span class="mark" style="color:var(--${r.correct ? 'success' : 'error'})">${r.correct ? '✓' : '✗'}</span><div><div class="s">${esc(s)}</div>${c}</div></div>`;
+    }).join('');
+    const missed = total - score;
+    if (missed > 0 && live) {
+      $('added').textContent = `${missed} missed item${missed > 1 ? 's' : ''} will be added to your deck`;
+      $('added').classList.remove('hidden');
+    }
+    if (live) {
+      try {
+        await fetch('/api/quiz', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: quiz.title, score, total,
+            missed: results.filter(r => !r.correct).map(r => ({ prompt: r.q.prompt || r.q.display, answer: r.q.type === 'choice' ? r.q.options[r.q.correct] : primaryAns(r.q) || r.q.display, explain: r.q.explain })) }) });
+      } catch (e) {}
+    }
+  }
+
+  fetch('/api/quiz').then(r => r.ok ? r.json() : null).then(d => {
+    if (d && Array.isArray(d.questions) && d.questions.length) { quiz = d; live = true; }
+    render();
+  }).catch(() => render());
+})();
+</script>
+</body>
+</html>

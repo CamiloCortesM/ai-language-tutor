@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutor — Dashboard</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 5; }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand b { font-family: var(--font-display); font-size: 17px; }
+  .brand span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+  main { width: 100%; max-width: 960px; margin: 0 auto; padding: 24px 20px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .tile { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-1); padding: 18px 20px; display: flex; align-items: center; gap: 14px; }
+  .big { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1; }
+  .lbl { font-size: 12px; font-weight: 600; color: var(--ink-faint); margin-top: 4px; }
+  .chip { background: var(--accent-soft); color: var(--accent-strong); font-family: var(--font-display); font-weight: 700; font-size: 15px; padding: 3px 10px; border-radius: 8px; }
+  .track { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+  .track > div { height: 100%; background: var(--accent); border-radius: 3px; }
+  section.panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-1); padding: 20px; }
+  h2 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .kw { font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+  .kw small { font-size: 12px; font-weight: 600; color: var(--ink-faint); }
+  .axis { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--ink-faint); margin-top: 4px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .due-num { font-family: var(--font-display); font-weight: 700; font-size: 36px; line-height: 1; }
+  .btn-soft { display: inline-block; background: var(--accent-soft); color: var(--accent-strong); text-decoration: none; font-weight: 700; font-size: 14px; padding: 10px 16px; border-radius: var(--radius-sm); align-self: flex-start; }
+  .btn-soft:hover { filter: brightness(.97); }
+  .err { display: flex; align-items: baseline; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .err b { font-family: var(--font-display); font-size: 13px; color: var(--error); min-width: 26px; }
+  .err .l { font-size: 14px; font-weight: 600; }
+  .err .e { font-size: 12px; color: var(--ink-soft); }
+  .cta { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-1); padding: 16px 20px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; text-align: center; }
+  .cta span { font-size: 15px; font-weight: 600; color: var(--ink-soft); }
+  .cta code { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 14px; font-weight: 700; background: var(--surface-2); color: var(--ink); padding: 7px 14px; border-radius: 8px; }
+  .muted { color: var(--ink-faint); font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>Tutor</b><span>Home</span></div>
+  <span class="chip" id="level-chip">–</span>
+</header>
+<main>
+  <section class="row">
+    <div class="tile">
+      <span style="font-size:26px">🔥</span>
+      <div><div class="big" id="streak">0</div><div class="lbl">day streak</div></div>
+    </div>
+    <div class="tile">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span class="chip" id="level">–</span>
+          <span class="lbl" style="margin:0" id="level-next"></span>
+        </div>
+        <div class="track"><div id="level-bar" style="width:0"></div></div>
+      </div>
+    </div>
+    <div class="tile">
+      <div><div class="big" id="unit">–</div><div class="lbl">current unit</div></div>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Vocabulary</h2>
+      <span class="kw"><span id="known">0</span> <small>words known</small></span>
+    </div>
+    <svg id="chart" viewBox="0 0 600 150" style="width:100%;height:auto;display:block" role="img" aria-label="Known words over time"></svg>
+    <div class="axis"><span id="axis-from">start</span><span>today</span></div>
+  </section>
+  <section class="grid2">
+    <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <h2>Due today</h2>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <span class="due-num" id="due">0</span>
+        <span class="muted">cards ready for review</span>
+      </div>
+      <a class="btn-soft" href="flashcards.html">Review cards</a>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:10px">
+      <h2>Recurring errors</h2>
+      <div id="errors"><span class="muted">Nothing recurring yet — that's a good sign.</span></div>
+    </div>
+  </section>
+  <div class="cta">
+    <span>Your tutor runs today’s session — say</span>
+    <code>“session”</code>
+    <span>in your AI agent</span>
+  </div>
+</main>
+<script>
+(() => {
+  const DEMO = { streak: 12, level: 'A2', unit: 5, levelPct: 33, knownWords: 418, dueCount: 23,
+    history: [180, 205, 236, 258, 291, 334, 372, 418],
+    topErrors: [
+      { count: 7, label: 'past simple vs. present perfect', example: '“I have seen him yesterday” → I saw him yesterday' },
+      { count: 5, label: 'missing subject “it”', example: '“Is raining a lot” → It’s raining a lot' },
+      { count: 4, label: 'false friend: actually', example: '“Actually I live in Cali” → Currently, I live in Cali' },
+    ]};
+  const $ = id => document.getElementById(id);
+  const esc = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  const NEXT = { A1: 'A2', A2: 'B1', B1: 'B2', B2: 'C1', C1: 'C2' };
+
+  function render(d) {
+    $('streak').textContent = d.streak ?? 0;
+    const lvl = d.level || '–';
+    $('level').textContent = lvl; $('level-chip').textContent = lvl;
+    $('level-next').textContent = NEXT[lvl] ? `${d.levelPct ?? 0}% to ${NEXT[lvl]}` : '';
+    $('level-bar').style.width = (d.levelPct ?? 0) + '%';
+    $('unit').textContent = d.unit ?? '–';
+    $('known').textContent = d.knownWords ?? 0;
+    $('due').textContent = d.dueCount ?? 0;
+    const h = (d.history && d.history.length > 1) ? d.history : [0, d.knownWords ?? 0];
+    const max = Math.max(...h, 1) * 1.1;
+    const pts = h.map((v, i) => [20 + i * (560 / (h.length - 1)), 140 - (v / max) * 125]);
+    const line = 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+    const area = line + ` L${pts[pts.length - 1][0].toFixed(1)} 148 L${pts[0][0].toFixed(1)} 148 Z`;
+    $('chart').innerHTML =
+      `<path d="${area}" fill="var(--accent-soft)"></path>` +
+      `<path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"></path>` +
+      `<circle cx="${pts[pts.length - 1][0].toFixed(1)}" cy="${pts[pts.length - 1][1].toFixed(1)}" r="4" fill="var(--accent)"></circle>`;
+    $('axis-from').textContent = h.length > 2 ? `${h.length} sessions ago` : 'start';
+    if (d.topErrors && d.topErrors.length) {
+      $('errors').innerHTML = d.topErrors.map(e =>
+        `<div class="err"><b>${e.count}×</b><div><div class="l">${esc(e.label)}</div><div class="e">${esc(e.example)}</div></div></div>`).join('');
+    }
+  }
+
+  fetch('/api/progress').then(r => r.ok ? r.json() : null)
+    .then(d => render(d || DEMO)).catch(() => render(DEMO));
+})();
+</script>
+</body>
+</html>

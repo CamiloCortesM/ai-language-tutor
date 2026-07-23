@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutor — Reader</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 5; }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand b { font-family: var(--font-display); font-size: 17px; }
+  .brand span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+  .listen-all { border: none; background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; }
+  .listen-all:hover { filter: brightness(.97); }
+  main { width: 100%; max-width: 660px; margin: 0 auto; padding: 36px 22px 120px; box-sizing: border-box; }
+  .kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
+  h1 { font-family: var(--font-text); font-weight: 700; font-size: 34px; line-height: 1.2; margin: 0 0 28px; text-wrap: pretty; }
+  .para { position: relative; margin-bottom: 26px; }
+  .pspeak { position: absolute; left: -46px; top: 4px; background: var(--surface); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: var(--shadow-1); }
+  .pspeak:hover { filter: brightness(.97); }
+  @media (max-width: 760px) { .pspeak { position: static; margin-bottom: 6px; } }
+  .para p { font-family: var(--font-text); font-size: 21px; line-height: 1.75; margin: 0; text-wrap: pretty; }
+  .para p.reading { background: var(--accent-soft); border-radius: 8px; }
+  .w { font-family: inherit; font-size: inherit; line-height: inherit; border: none; padding: 0 2px; margin: 0; cursor: pointer; border-radius: 5px; background: transparent; color: var(--ink); border-bottom: 2px dotted var(--accent); }
+  .w:hover, .w.open { background: var(--accent-soft); }
+  .pop { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); width: min(420px, calc(100vw - 32px)); background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); padding: 18px 20px; z-index: 20; animation: tut-rise .2s var(--ease); box-sizing: border-box; }
+  .pop-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .pop-head b { font-family: var(--font-text); font-size: 22px; }
+  .wspeak { background: var(--surface-2); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; flex-shrink: 0; }
+  .pop .def { font-size: 15px; color: var(--ink-soft); margin: 4px 0 2px; }
+  .pop .l1 { font-size: 14px; font-weight: 700; color: var(--accent-strong); margin-bottom: 8px; }
+  .pop .ex { font-family: var(--font-text); font-size: 16px; font-style: italic; color: var(--ink-soft); margin-bottom: 14px; }
+  .add { border: none; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 14px; padding: 10px 18px; border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; }
+  .add:hover { filter: brightness(1.06); }
+  .added-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--good-bg); color: var(--good-ink); font-weight: 700; font-size: 14px; padding: 10px 18px; border-radius: var(--radius-sm); animation: tut-pop .3s var(--ease); }
+  footer { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); box-shadow: var(--shadow-2); padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); box-sizing: border-box; z-index: 10; }
+  .foot { max-width: 660px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .track { flex: 1; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+  .track > div { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width .15s linear; }
+  .foot .pct, .foot .col { font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .foot .pct { color: var(--ink-soft); }
+  .foot .col { font-weight: 700; color: var(--accent-strong); background: var(--accent-soft); padding: 5px 10px; border-radius: 8px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>Tutor</b><span>Reader</span></div>
+  <button class="listen-all" id="listen-all">▶ Read to me</button>
+</header>
+<main id="main">
+  <div class="kicker"><span id="level"></span> · <span id="mins"></span> min read</div>
+  <h1 id="title"></h1>
+  <div id="paras"></div>
+</main>
+<div class="pop hidden" id="pop" role="dialog" aria-label="Word definition">
+  <div class="pop-head"><b id="pop-word"></b><button class="wspeak" id="pop-speak" aria-label="Pronounce">🔊</button></div>
+  <div class="def" id="pop-def"></div>
+  <div class="l1" id="pop-l1"></div>
+  <div class="ex" id="pop-ex"></div>
+  <button class="add" id="pop-add">+ Add to deck</button>
+  <span class="added-chip hidden" id="pop-added">✓ In your deck</span>
+</div>
+<footer>
+  <div class="foot">
+    <div class="track" role="progressbar" aria-label="Reading progress"><div id="readbar"></div></div>
+    <span class="pct"><span id="pct">0</span>% read</span>
+    <span class="col"><span id="collected">0</span> words collected</span>
+  </div>
+</footer>
+<script>
+(() => {
+  const DEMO = {
+    title: 'The Bakery on Sol Street', level: 'A2', minutes: 4,
+    glossary: {
+      bakery: { def: 'a shop where bread and cakes are made and sold (noun)', l1: 'panadería', example: 'The bakery opens at six.' },
+      dawn: { def: 'the time of day when light first appears (noun)', l1: 'amanecer, madrugada', example: 'She gets up before dawn.' },
+      flour: { def: 'the white powder used to make bread (noun)', l1: 'harina', example: 'Bread is made with flour.' },
+      smell: { def: 'the quality you notice with your nose (noun)', l1: 'olor', example: 'The smell of coffee wakes me up.' },
+      neighbors: { def: 'people who live near you (noun, pl.)', l1: 'vecinos', example: 'My neighbors are very friendly.' },
+      bake: { def: 'to cook something inside an oven (verb)', l1: 'hornear', example: 'She likes to bake on Sundays.' },
+      dough: { def: 'the soft mix of flour and water before baking (noun)', l1: 'masa', example: 'The dough needs to rest.' },
+      proud: { def: 'feeling pleased about something you did well (adjective)', l1: 'orgulloso/a', example: 'She is proud of her work.' },
+    },
+    paragraphs: [
+      'Every day at four in the morning, before dawn, Rosa opens the door of her small bakery on Sol Street. The city is still sleeping, but her hands are already covered in flour.',
+      'Rosa loves to bake. First she prepares the dough, slowly and without hurry. She says that bread knows when you are in a hurry, and then it does not rise well.',
+      "At seven o'clock, the smell of fresh bread reaches the square. The neighbors wait in line at the door: Mr. Ortiz always buys two baguettes, and the children ask for warm croissants.",
+      'Rosa looks at the line from the counter and smiles. She is proud of something very simple: every morning, her little oven wakes up the whole neighborhood.',
+    ],
+  };
+  let story = DEMO, open = null, added = [], live = false;
+  const $ = id => document.getElementById(id);
+  const esc = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+  let premiumTTS = true, currentAudio = null;
+  async function speak(text, onend) {
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    if (premiumTTS) {
+      try {
+        const r = await fetch('/api/tts?text=' + encodeURIComponent(text));
+        if (r.status === 200) {
+          currentAudio = new Audio(URL.createObjectURL(await r.blob()));
+          if (onend) currentAudio.onended = onend;
+          currentAudio.play();
+          return;
+        }
+        if (r.status === 204) premiumTTS = false;
+      } catch (e) { premiumTTS = false; }
+    }
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = story.lang || 'en-GB'; u.rate = 0.92;
+      if (onend) u.onend = onend;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  function render() {
+    $('title').textContent = story.title;
+    $('level').textContent = story.level || '';
+    $('mins').textContent = story.minutes || Math.max(1, Math.round(story.paragraphs.join(' ').split(' ').length / 90));
+    $('paras').innerHTML = story.paragraphs.map((text, pi) => {
+      const tokens = text.split(/(\p{L}+)/u).filter(t => t.length).map(t => {
+        const key = t.toLowerCase();
+        return story.glossary[key]
+          ? `<button class="w" data-w="${esc(key)}" aria-label="New word: ${esc(t)}. Tap for definition.">${esc(t)}</button>`
+          : esc(t);
+      }).join('');
+      return `<div class="para">
+        <button class="pspeak" data-p="${pi}" aria-label="Read paragraph aloud">🔊</button>
+        <p id="p-${pi}">${tokens}</p>
+      </div>`;
+    }).join('');
+  }
+
+  function showPop(key) {
+    const e = story.glossary[key];
+    if (!e) return;
+    open = key;
+    document.querySelectorAll('.w').forEach(w => w.classList.toggle('open', w.dataset.w === key));
+    $('pop-word').textContent = key;
+    $('pop-def').textContent = e.def || '';
+    $('pop-l1').textContent = e.l1 || e.es || '';
+    $('pop-ex').textContent = e.example ? '“' + e.example + '”' : '';
+    const isAdded = added.includes(key);
+    $('pop-add').classList.toggle('hidden', isAdded);
+    $('pop-added').classList.toggle('hidden', !isAdded);
+    $('pop').classList.remove('hidden');
+  }
+
+  function closePop() {
+    open = null;
+    $('pop').classList.add('hidden');
+    document.querySelectorAll('.w.open').forEach(w => w.classList.remove('open'));
+  }
+
+  function readAlong(pi) {
+    if (pi >= story.paragraphs.length) return;
+    const p = $('p-' + pi);
+    document.querySelectorAll('.para p').forEach(el => el.classList.remove('reading'));
+    p.classList.add('reading');
+    p.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    speak(story.paragraphs[pi], () => {
+      p.classList.remove('reading');
+      readAlong(pi + 1);
+    });
+  }
+
+  document.addEventListener('click', e => {
+    const w = e.target.closest('.w');
+    const ps = e.target.closest('.pspeak');
+    if (w) { e.stopPropagation(); showPop(w.dataset.w); return; }
+    if (ps) { e.stopPropagation(); speak(story.paragraphs[+ps.dataset.p]); return; }
+    if (!e.target.closest('.pop')) closePop();
+  });
+  $('listen-all').addEventListener('click', e => { e.stopPropagation(); readAlong(0); });
+  $('pop-speak').addEventListener('click', () => speak(open));
+  $('pop-add').addEventListener('click', () => {
+    if (!open || added.includes(open)) return;
+    added.push(open);
+    $('collected').textContent = added.length;
+    $('pop-add').classList.add('hidden');
+    $('pop-added').classList.remove('hidden');
+    if (live) {
+      const e = story.glossary[open];
+      fetch('/api/text', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addWord: open, def: e.def, example: e.example, l1: e.l1 || '' }) }).catch(() => {});
+    }
+  });
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const max = el.scrollHeight - el.clientHeight;
+    $('pct').textContent = max > 0 ? Math.min(100, Math.round(el.scrollTop / max * 100)) : 0;
+    $('readbar').style.width = $('pct').textContent + '%';
+  }, { passive: true });
+
+  fetch('/api/text').then(r => r.ok ? r.json() : null).then(d => {
+    if (d && Array.isArray(d.paragraphs)) { story = d; story.glossary = story.glossary || {}; live = true; }
+    render();
+  }).catch(() => render());
+})();
+</script>
+</body>
+</html>

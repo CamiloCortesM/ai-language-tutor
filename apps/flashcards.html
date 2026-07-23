@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutor — Flashcards</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .bar { height: 4px; background: var(--surface-2); }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .25s var(--ease); }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand b { font-family: var(--font-display); font-size: 17px; }
+  .brand span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+  .meta { display: flex; align-items: center; gap: 16px; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+  .streak { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--ink); }
+  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px 32px; width: 100%; max-width: 640px; margin: 0 auto; box-sizing: border-box; }
+  .scene { perspective: 1400px; width: 100%; }
+  .card { position: relative; width: 100%; min-height: 340px; cursor: pointer; transform-style: preserve-3d; transition: transform .25s var(--ease); }
+  .card.flipped { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 30px; box-sizing: border-box; text-align: center; }
+  .face.back { transform: rotateY(180deg); }
+  .sentence { font-family: var(--font-text); font-size: 26px; line-height: 1.5; text-wrap: pretty; }
+  .gap { display: inline-block; min-width: 72px; border-bottom: 2px solid var(--accent); }
+  .sentence mark { background: var(--accent-soft); color: var(--accent-strong); border-radius: 6px; padding: 0 6px; font-weight: 700; }
+  .hint { font-size: 16px; font-weight: 600; color: var(--ink-soft); }
+  .wordrow { display: flex; align-items: baseline; justify-content: center; gap: 9px; flex-wrap: wrap; }
+  .wordrow b { font-family: var(--font-display); font-size: 20px; }
+  .wordrow .ipa { font-size: 14px; color: var(--ink-faint); }
+  .wordrow .pos { font-size: 13px; font-style: italic; color: var(--ink-faint); }
+  .def { font-size: 15px; line-height: 1.45; color: var(--ink-soft); max-width: 440px; }
+  .trans { font-size: 14px; font-style: italic; color: var(--ink-faint); }
+  .speak { background: var(--surface-2); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .speak:hover { filter: brightness(.96); }
+  .tip { font-size: 12px; font-weight: 600; color: var(--ink-faint); }
+  .grades { display: none; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; margin-top: 22px; animation: tut-rise .2s var(--ease); }
+  .grades.show { display: grid; }
+  .grades button { border: none; cursor: pointer; border-radius: var(--radius-sm); padding: 12px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 44px; font-weight: 700; font-size: 15px; }
+  .grades button:hover { filter: brightness(.97); }
+  .grades button:active { transform: scale(.97); }
+  .grades small { font-size: 11px; font-weight: 600; opacity: .75; }
+  .g1 { background: var(--again-bg); color: var(--again-ink); }
+  .g2 { background: var(--hard-bg); color: var(--hard-ink); }
+  .g3 { background: var(--good-bg); color: var(--good-ink); }
+  .g4 { background: var(--easy-bg); color: var(--easy-ink); }
+  .keys { text-align: center; font-size: 11px; font-weight: 600; color: var(--ink-faint); margin-top: 10px; }
+  .end { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); padding: 40px 32px; text-align: center; width: 100%; box-sizing: border-box; animation: tut-rise .25s var(--ease); }
+  .check { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-soft); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; animation: tut-pop .35s var(--ease); }
+  .end h2 { font-family: var(--font-display); font-size: 26px; margin: 0 0 18px; }
+  .stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 26px; }
+  .stats b { display: block; font-family: var(--font-display); font-size: 28px; }
+  .stats small { font-size: 12px; font-weight: 600; color: var(--ink-faint); }
+  .done-btn { display: inline-block; background: var(--accent); color: var(--on-accent); border: none; font-weight: 700; font-size: 16px; padding: 13px 32px; border-radius: var(--radius-sm); cursor: pointer; }
+  .done-btn:hover { filter: brightness(1.06); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body style="min-height:100vh;display:flex;flex-direction:column">
+<div class="bar" role="progressbar" aria-label="Session progress"><div id="bar"></div></div>
+<header>
+  <div class="brand"><b>Tutor</b><span>Flashcards</span></div>
+  <div class="meta">
+    <span class="streak" id="streak-box" aria-label="Streak">🔥 <span id="streak">–</span></span>
+    <span><span id="reviewed">0</span>/<span id="total">0</span></span>
+  </div>
+</header>
+<main>
+  <div id="session">
+    <div class="scene">
+      <div class="card" id="card" role="button" tabindex="0" aria-label="Flashcard. Press space or tap to flip.">
+        <div class="face front">
+          <div class="sentence" id="front-sentence"></div>
+          <div class="hint" id="hint"></div>
+          <button class="speak" id="speak-front" aria-label="Listen to the sentence">🔊</button>
+          <div class="tip">tap or press space to flip</div>
+        </div>
+        <div class="face back">
+          <div class="sentence" id="back-sentence"></div>
+          <div class="wordrow"><b id="word"></b><span class="ipa" id="ipa"></span><span class="pos" id="pos"></span></div>
+          <div class="def" id="def"></div>
+          <div class="trans" id="trans"></div>
+          <button class="speak" id="speak-back" aria-label="Listen to the full sentence">🔊</button>
+        </div>
+      </div>
+    </div>
+    <div class="grades" id="grades">
+      <button class="g1" data-g="1" aria-label="Again, key 1">Again<small>&lt;10m</small></button>
+      <button class="g2" data-g="2" aria-label="Hard, key 2">Hard<small>~2d</small></button>
+      <button class="g3" data-g="3" aria-label="Good, key 3">Good<small>~4d</small></button>
+      <button class="g4" data-g="4" aria-label="Easy, key 4">Easy<small>~11d</small></button>
+    </div>
+    <div class="keys">keys 1–4</div>
+  </div>
+  <div class="end hidden" id="end">
+    <div class="check">✓</div>
+    <h2 id="end-title">Session complete</h2>
+    <div class="stats">
+      <div><b id="end-total">0</b><small>cards</small></div>
+      <div><b id="end-acc">0%</b><small>accuracy</small></div>
+    </div>
+    <button class="done-btn" id="close">Done</button>
+  </div>
+</main>
+<script>
+(() => {
+  const DEMO = [
+    { id: 'd1', front: 'Can I ___ your pen? I forgot mine.', answer: 'borrow', hint: 'pedir prestado', ipa: '/ˈbɒr.əʊ/', pos: 'verb', definition: 'to take something that you will give back later', translation: '¿Me prestas tu bolígrafo? Olvidé el mío.' },
+    { id: 'd2', front: "She usually ___ up at seven o'clock.", answer: 'wakes', word: 'wake up', hint: 'despertarse', ipa: '/weɪk/', pos: 'phrasal verb', definition: 'to stop sleeping', translation: 'Ella normalmente se despierta a las siete.' },
+    { id: 'd3', front: "There isn't ___ milk in the fridge.", answer: 'any', hint: 'nada de', ipa: '/ˈen.i/', pos: 'determiner', definition: 'used in negatives: not even a small amount', translation: 'No queda nada de leche en la nevera.' },
+    { id: 'd4', front: 'How much does this book ___?', answer: 'cost', hint: 'costar', ipa: '/kɒst/', pos: 'verb', definition: 'to have a particular price', translation: '¿Cuánto cuesta este libro?' },
+  ];
+  let deck = [], i = 0, flipped = false, results = [], live = false;
+
+  const $ = id => document.getElementById(id);
+  const card = $('card'), grades = $('grades');
+
+  let premiumTTS = true;
+  async function speak(text) {
+    if (premiumTTS) {
+      try {
+        const r = await fetch('/api/tts?text=' + encodeURIComponent(text));
+        if (r.status === 200) {
+          new Audio(URL.createObjectURL(await r.blob())).play();
+          return;
+        }
+        if (r.status === 204) premiumTTS = false;
+      } catch (e) { premiumTTS = false; }
+    }
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-GB'; u.rate = 0.95;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  function render() {
+    $('reviewed').textContent = i; $('total').textContent = deck.length;
+    $('bar').style.width = (deck.length ? i / deck.length * 100 : 0) + '%';
+    if (i >= deck.length) return finish();
+    const c = deck[i], parts = c.front.split('___');
+    $('front-sentence').innerHTML = esc(parts[0]) + '<span class="gap">&nbsp;</span>' + esc(parts[1] ?? '');
+    $('hint').textContent = c.hint ? '(' + c.hint + ')' : '';
+    $('back-sentence').innerHTML = esc(parts[0]) + '<mark>' + esc(c.answer) + '</mark>' + esc(parts[1] ?? '');
+    $('word').textContent = c.word || c.answer;
+    $('ipa').textContent = c.ipa || ''; $('pos').textContent = c.pos || '';
+    $('def').textContent = c.definition || ''; $('trans').textContent = c.translation || '';
+    flipped = false; card.classList.remove('flipped'); grades.classList.remove('show');
+  }
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+
+  function flip() {
+    if (i >= deck.length) return;
+    flipped = !flipped;
+    card.classList.toggle('flipped', flipped);
+    grades.classList.toggle('show', flipped);
+  }
+
+  function grade(g) {
+    if (!flipped || i >= deck.length) return;
+    results.push({ id: deck[i].id, grade: g });
+    i++; render();
+  }
+
+  async function finish() {
+    $('session').classList.add('hidden'); $('end').classList.remove('hidden');
+    $('end-total').textContent = results.length;
+    const good = results.filter(r => r.grade >= 3).length;
+    $('end-acc').textContent = (results.length ? Math.round(good / results.length * 100) : 0) + '%';
+    if (!results.length) $('end-title').textContent = 'No cards due — nice!';
+    if (live && results.length) {
+      try {
+        await fetch('/api/deck', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ results }) });
+      } catch (e) {}
+    }
+  }
+
+  card.addEventListener('click', flip);
+  grades.addEventListener('click', e => { const b = e.target.closest('button'); if (b) grade(+b.dataset.g); });
+  $('speak-front').addEventListener('click', e => { e.stopPropagation(); speak(deck[i].front.replace('___', '…')); });
+  $('speak-back').addEventListener('click', e => { e.stopPropagation(); speak(deck[i].front.replace('___', deck[i].answer)); });
+  $('close').addEventListener('click', () => { window.close(); });
+  window.addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); flip(); }
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 4) grade(n);
+  });
+
+  fetch('/api/deck').then(r => r.ok ? r.json() : null).then(d => {
+    if (d && Array.isArray(d.cards)) { deck = d.cards; live = true; }
+    else deck = DEMO;
+    render();
+  }).catch(() => { deck = DEMO; render(); });
+
+  fetch('/api/progress').then(r => r.ok ? r.json() : null)
+    .then(p => { if (p) $('streak').textContent = p.streak; }).catch(() => {});
+})();
+</script>
+</body>
+</html>
