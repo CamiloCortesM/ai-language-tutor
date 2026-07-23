@@ -1,6 +1,6 @@
 # Architecture — AI Language Tutor (A1 → C1)
 
-> Synthesis of the research in `docs/research/`. Status: proposal, pending approval before building.
+> Synthesis of the research in `docs/research/`. Living design document — kept in sync with the implementation.
 
 ## Design principles
 
@@ -9,7 +9,7 @@
 3. **Multi-language by design — on both sides.** The method (`activities/`, `docs/methodology.md`) is language-agnostic. Everything specific to a **target** language lives under `languages/<target>/` (curriculum, vocab lists); English ships first, adding a language = adding a folder. The learner's **native** language (any L1) is just a profile field: curriculum files are target-language-only, and all L1-specific material — hints, translations, contrastive explanations — is generated at runtime for that learner. Optional `l1-notes/<L1>.md` files capture known pitfalls per language pair (Spanish ships first); when absent, the tutor uses its own contrastive knowledge.
 4. **Multi-user.** Learner data lives in `student/` (gitignored). The repo ships `student.example/` as a template; the placement test fills it in on first use.
 5. **Evidence-based** (see `docs/research/evidence-based-methods.md`): Nation's four strands ~25% each, comprehensible input at 95–98% known words, spaced retrieval practice, brief explicit grammar with *focus on form*, correction via *prompts* (self-correction), HVPT/minimal pairs for pronunciation.
-6. **Voice is optional.** Where the agent has voice (or on macOS via `tools/voice.sh`: record → whisper.cpp → `say`), speaking activities use it; otherwise there is a text fallback.
+6. **Spoken lessons always use a real voice AI.** The agent's own voice mode where it exists, or the voice bridge (`portable/voice-tutor.md`): Lesson Pass → spoken lesson in ChatGPT/Claude/any voice AI → Lesson Report synced back into memory. TTS (`tools/tts.py`) covers read-alouds and precision audio; there is a text fallback that logs speaking debt.
 
 ## Repo structure
 
@@ -33,15 +33,14 @@ learning-language/
 │   ├── pronunciation.md   # minimal pairs, shadowing, L1-specific trouble sounds
 │   ├── grammar-lesson.md  # brief explicit lesson + communicative practice
 │   ├── fluency.md         # 4/3/2 and automatization activities
-│   └── exam-simulator.md  # Cambridge-style mock exam (gate to next level)
+│   ├── exam-simulator.md  # Cambridge-style mock exam (gate to next level)
+│   └── generate-language.md # generates the curriculum for a new target language
 ├── languages/
 │   └── english/
 │       ├── curriculum/
 │       │   ├── overview.md    # A1→C1 map: hours, vocab targets, level-up criteria
 │       │   ├── a1/            # ~10-12 units per level: unit-01.md, unit-02.md…
 │       │   ├── a2/  b1/  b2/  c1/   # each unit: grammar + target vocab + functions
-│       │   └── vocab/         #   + can-do statements + suggested activities
-│       │       └── oxford-{a1..c1}.txt   # word lists per level (Oxford 3000/5000)
 │       └── l1-notes/
 │           └── spanish.md     # typical errors for Spanish speakers (phonology, grammar, false friends)
 ├── student/               # learner data (gitignored)
@@ -53,6 +52,8 @@ learning-language/
 │       ├── known_words.txt #  known lemmas (drives the comprehensibility ratio)
 │       └── cards.json     #   SRS deck (cloze cards with FSRS state)
 ├── student.example/       # commented template of all of the above
+├── portable/
+│   └── voice-tutor.md     # voice bridge: run spoken lessons in any voice AI
 ├── apps/                  # self-contained HTML apps (no frameworks, no build)
 │   ├── flashcards.html    # SRS review UI: flip cards, Again/Hard/Good/Easy, browser TTS
 │   ├── quiz.html          # written tests per unit: MCQ, gap-fill; self-grading
@@ -60,8 +61,8 @@ learning-language/
 │   └── reader.html        # LingQ-style assisted reading: tap word → gloss → card
 └── tools/
     ├── srs.py             # FSRS (minimal formulas) + due list + streak. Python stdlib.
-    ├── serve.py           # ~30-line stdlib server: serves apps/ + reads/writes student/
-    └── voice.sh           # optional macOS: record → whisper.cpp → say
+    ├── serve.py           # stdlib server: serves apps/ + JSON API over student/
+    └── tts.py             # neural TTS (edge-tts free / OpenAI / ElevenLabs) with cache
 ```
 
 ## HTML apps
@@ -78,7 +79,7 @@ Every activity declares a `mode`, and the tutor enforces it — speaking a langu
 | `voice-preferred` | Use voice if available; chat is an acceptable fallback | conversation at A1–A2, listening (TTS audio counts) |
 | `voice-required` | The point IS speaking aloud. The tutor must run this in call/voice mode and says so explicitly | conversation from B1 up, pronunciation, fluency (4/3/2), the speaking paper of exam-simulator |
 
-How voice happens depends on the harness, in order of preference: (1) the agent's native voice/call mode (e.g. Claude or ChatGPT mobile voice); (2) `tools/voice.sh` locally (record → whisper.cpp → agent → TTS); (3) no voice available → the tutor still forces production: "read your answer aloud 3 times, then type it" — and marks the step as done-in-fallback in `progress.json` so speaking debt is visible.
+How voice happens depends on the harness, in order of preference: (1) the agent's native voice/call mode; (2) the voice bridge — Lesson Pass → spoken lesson in any voice AI (ChatGPT, Claude…) → Lesson Report ingested back (`portable/voice-tutor.md`); (3) no voice available → the tutor still forces production: "read your answer aloud 3 times, then type it" — and marks the step as done-in-fallback in `progress.json` so speaking debt is visible.
 
 Learners also set a **voice preference** in their profile: `always` (the whole session runs in voice/call mode where the harness supports it, and chat activities get oral variants — oral quiz, dictation), `when_required` (default — voice only where the mode demands it), or `text_first` (text everywhere, speaking debt tracked).
 
@@ -103,7 +104,7 @@ The daily session plan always shows each step with its mode up front (e.g. 🎙�
 |---|---|---|
 | **1. Core** | AGENTS.md, methodology.md, placement-test, session, srs.py + srs-review, conversation, English curriculum A1–A2, student.example, serve.py + core apps (flashcards, quiz, dashboard) | You can genuinely study with it |
 | **2. Full course** | reading + reader.html, writing (CEFR rubrics), listening, grammar-lesson, fluency, English curriculum B1–B2, exam-simulator | Complete course through B2 |
-| **3. Polish** | pronunciation + voice.sh, English curriculum C1, l1-notes, public README, license, GitHub repo | Open-source, usable by anyone; structure ready for more languages |
+| **3. Polish** | pronunciation, English curriculum C1, l1-notes, voice bridge, public README, license, GitHub repo | Open-source, usable by anyone; structure ready for more languages |
 
 ## Deliberate simplifications (and their ceilings)
 
