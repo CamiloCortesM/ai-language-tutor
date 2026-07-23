@@ -18,6 +18,7 @@ Generated or chosen texts/audio keep **95–98% of words within `student/known_w
 - Context must make the target the natural choice ("I need to ___ money from the bank" → borrow). Generic frames where anything fits are bad cards.
 - Sources of new cards, in priority order: learner's own errors > unit target vocab > words tapped in reading > placement gaps.
 - **≤15 new cards/day.** Reviews always come before new material in a session.
+- **Backlog rule:** more than ~30 cards due (e.g. after days away) → add ZERO new cards until the queue is cleared; review the most overdue first, in chunks of ≤30, across as many days as needed. Welcome the learner back warmly — never guilt-trip about the pile; late reviews they still remember actually strengthen memory more (FSRS rewards the harder recall).
 - Multiple senses/collocations of one word = separate cards. At very early A1, simple word↔meaning cards are allowed; migrate to cloze as soon as sentences are viable.
 - Words the learner produces correctly and unprompted across ≥3 different sessions → `known_words.txt`.
 

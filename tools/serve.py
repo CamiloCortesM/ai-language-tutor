@@ -52,13 +52,16 @@ def lang_dir():
         return None
 
 
-def due_cards():
+def due_cards(limit=None):
     d = lang_dir()
     if d is None:
         return []
     deck = read_json(d / "cards.json", {"cards": []})["cards"]
     today = date.today().isoformat()
-    return [c for c in deck if c.get("due") is None or c["due"] <= today]
+    due = [c for c in deck if c.get("due") is None or c["due"] <= today]
+    # most-overdue reviews first, brand-new cards last
+    due.sort(key=lambda c: (c.get("due") is None, c.get("due") or ""))
+    return due[:limit] if limit else due
 
 
 def progress_payload():
@@ -121,7 +124,8 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
         elif self.path == "/api/deck":
-            self._json({"cards": due_cards()})
+            # ponytail: fixed 30-card session cap; make it configurable if anyone asks
+            self._json({"cards": due_cards(limit=30), "totalDue": len(due_cards())})
         elif self.path == "/api/progress":
             self._json(progress_payload())
         elif self.path == "/api/quiz":
