@@ -43,9 +43,8 @@ Voice preference in the profile (`voice`):
 
 **Voice channel priority for speaking steps** (pick the best available, learner can override):
 1. Harness voice/call mode (you speak directly).
-2. **`talk.html`** — browser call mode that works in text-only harnesses (Cowork, Claude Code): browser mic → event file → your reply → neural TTS. Protocol in `activities/conversation.md`.
-3. **Voice GPT handoff** — Lesson Pass → spoken lesson in the learner's Custom GPT (setup: `portable/chatgpt-voice-tutor.md`) → Lesson Report pasted back and ingested into memory (`activities/conversation.md`). Counts as real speaking.
-4. Aloud-3×-then-type fallback, logged as speaking debt.
+2. **Voice AI bridge** — Lesson Pass → spoken lesson in the learner's voice AI (ChatGPT, Claude, or any other; setup: `portable/voice-tutor.md`) → Lesson Report pasted back and ingested into memory (`activities/conversation.md`). Counts as real speaking.
+3. Aloud-3×-then-type fallback, logged as speaking debt.
 
 Never silently downgrade a voice-required step — the speaking debt must be visible.
 
@@ -60,7 +59,7 @@ Platform note: all tooling is OS-agnostic (Python stdlib + browser). For event-f
 
 ## HTML apps
 
-Available: `flashcards.html` (SRS review), `quiz.html` (unit checkpoints), `reader.html` (assisted reading with read-along), `dashboard.html` (progress). If a browser is available, prefer them over the chat protocol for these steps. Flow:
+Available: `flashcards.html` (SRS review), `quiz.html` (unit checkpoints), `reader.html` (assisted reading with read-along), `dashboard.html` (progress). If a browser is available, prefer them over the chat protocol for these steps. (Speaking never happens in the browser — see the voice channels above.) Flow:
 
 1. Start the server if not running: `python3 tools/serve.py` (background; port 8765).
 2. For quiz: first write `student/quiz-current.json` — `{"title": ..., "questions": [{"type": "choice|gap|reorder", "prompt", "options"?, "correct"?, "answers"?: [accepted strings], "words"?, "answer"?, "display"?, "explain"}]}`. Gap prompts embed the hint: `"Can I ___ your pen? (pedir prestado)"`. For reader: first write `student/reading-current.json` — `{"title", "level", "minutes", "lang"?: BCP47 for TTS (default en-GB), "glossary": {word: {"def", "l1": translation in the learner's native language, "example"}}, "paragraphs": [...]}` — glossary keys are the lowercase new words; every target word must appear in the text.

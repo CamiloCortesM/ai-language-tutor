@@ -1,19 +1,20 @@
-# Voice Lesson Tutor — Custom GPT setup
+# Voice Lesson Tutor — run spoken lessons in any voice AI
 
-Run spoken lessons in ChatGPT's voice mode, fully connected to your local tutor's memory through two small documents: the **Lesson Pass** (your tutor → the GPT) and the **Lesson Report** (the GPT → your tutor).
+Spoken lessons happen in whichever voice AI you prefer — **ChatGPT voice, Claude voice, or any other** — fully connected to your local tutor's memory through two small documents: the **Lesson Pass** (your tutor → the voice AI) and the **Lesson Report** (the voice AI → your tutor).
 
-## One-time setup (~5 minutes)
+## Setup — pick ONE (the instructions block at the bottom is the same for all)
 
-1. In ChatGPT: **Explore GPTs → Create**.
-2. Name it e.g. *"My Voice Language Tutor"*.
-3. Paste everything below the line at the bottom of this file into **Instructions**.
-4. Save (private). On your phone, open this GPT and use **voice mode** for lessons.
+**A. ChatGPT (Custom GPT, ~5 min):** Explore GPTs → Create → name it *"My Voice Language Tutor"* → paste the instructions block into **Instructions** → save as private. Use it with voice mode on your phone.
+
+**B. Claude (Project, ~5 min):** on claude.ai create a **Project** named *"Voice Language Tutor"* → paste the instructions block into the project's custom instructions. Start lesson chats inside that project and use **voice mode** in the Claude mobile app.
+
+**C. No setup:** paste the instructions block together with your Lesson Pass into any voice-capable AI chat, then switch to voice.
 
 ## How a lesson flows
 
-1. Your local tutor (Cowork, Claude Code…) reaches a speaking step and prints a **LESSON PASS** block — copy it.
-2. Open the GPT, paste the pass (or read it aloud), switch to voice mode. The GPT runs the whole lesson by voice until it's complete.
-3. At the end the GPT prints a **LESSON REPORT** block — copy it, paste it back to your local tutor. It updates your error log, creates flashcards from your mistakes, and marks the step done. Nothing is lost between the two apps.
+1. Your local tutor (in the repo folder — Cowork, Claude Code, Codex, OpenCode…) reaches a speaking step and prints a **LESSON PASS** block — copy it.
+2. Open your voice AI, paste the pass (or read it aloud), switch to voice mode. It runs the whole lesson by voice until it's complete.
+3. At the end it prints a **LESSON REPORT** block — copy it, paste it back to your local tutor. It updates your error log, creates flashcards from your mistakes, and marks the step done. Nothing is lost between the two apps.
 
 ---
 

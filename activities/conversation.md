@@ -9,8 +9,7 @@ The closest thing to a tutor session. You stay in character and in the target la
 - Scenario from the current unit's topic, the learner's interests, or their choice. Rotate types: transactional roleplay (hotel check-in, job interview, returning a purchase), opinion talk, picture/story description, free chat.
 - Announce scenario + your role + their goal in one line. From B1: run it by voice, choosing the best available channel in this order (AGENTS.md modes):
   1. **Harness voice mode** — you speak directly.
-  2. **`talk.html` (call mode in the browser)** — works even in text-only harnesses like Cowork/Claude Code. Protocol: write `student/talk-reply.json` `{"turn": 0, "reply": "<your spoken greeting + scenario>"}`, delete any stale `student/.event-talk.json`, open `http://localhost:8765/talk.html`, then loop: wait on `.event-talk.json` → read + delete it → if it has `"end": true`, return to chat and give the CORRECTIONS block there; else write the next `talk-reply.json` echoing the same `turn` number with your reply. Keep replies SHORT (1–3 sentences) — they are spoken aloud. Mark the final reply of a naturally-ending scenario with `"end": true`.
-  3. **Voice GPT handoff (Lesson Pass → Lesson Report)** — the learner set up the Custom GPT from `portable/chatgpt-voice-tutor.md` (offer that setup once if they haven't). Print this block for them to copy:
+  2. **Voice AI bridge (Lesson Pass → Lesson Report)** — the learner uses ANY voice AI: ChatGPT, Claude, etc. (offer the one-time setup from `portable/voice-tutor.md` if they haven't done it). Print this block for them to copy:
 
      ```
      === LESSON PASS ===
@@ -24,8 +23,8 @@ The closest thing to a tutor session. You stay in character and in the target la
      === END PASS ===
      ```
 
-     They do the lesson by voice in the GPT and come back with a `LESSON REPORT` block. Ingest it fully: `corrections` + `words_struggled` → `errors.md` and cloze cards; `did_well`/`performance` → session notes; `level_impression: below/above` twice in a row → flag for review/acceleration. Log the step with `"external_voice": true`. The step counts as REAL speaking (no debt).
-  4. `text_first` fallback — aloud-3×-then-type, logged.
+     They do the lesson by voice in their voice AI and come back with a `LESSON REPORT` block. Ingest it fully: `corrections` + `words_struggled` → `errors.md` and cloze cards; `did_well`/`performance` → session notes; `level_impression: below/above` twice in a row → flag for review/acceleration. Log the step with `"external_voice": true`. The step counts as REAL speaking (no debt).
+  3. `text_first` fallback — aloud-3×-then-type, logged.
 
 ## Language calibration (hard rules)
 

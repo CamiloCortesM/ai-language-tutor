@@ -130,8 +130,6 @@ class Handler(SimpleHTTPRequestHandler):
         elif self.path == "/api/text":
             text = read_json(STUDENT / "reading-current.json", None)
             self._json(text or {"error": "no text prepared"}, 200 if text else 404)
-        elif self.path == "/api/talk":
-            self._json(read_json(STUDENT / "talk-reply.json", {"turn": -1}))
         else:
             super().do_GET()
 
@@ -161,9 +159,6 @@ class Handler(SimpleHTTPRequestHandler):
             self._json({"ok": True})
         elif self.path == "/api/text":
             write_event("reader", body)
-            self._json({"ok": True})
-        elif self.path == "/api/talk":
-            write_event("talk", body)
             self._json({"ok": True})
         else:
             self._json({"error": "unknown endpoint"}, 404)
