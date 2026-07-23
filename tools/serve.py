@@ -44,20 +44,36 @@ def write_event(app, payload):
         json.dumps(out, indent=2, ensure_ascii=False) + "\n")
 
 
+def lang_dir():
+    """Active language folder, or None when no student data exists yet."""
+    try:
+        return srs.lang_dir()
+    except SystemExit:
+        return None
+
+
 def due_cards():
-    deck = read_json(STUDENT / "cards.json", {"cards": []})["cards"]
+    d = lang_dir()
+    if d is None:
+        return []
+    deck = read_json(d / "cards.json", {"cards": []})["cards"]
     today = date.today().isoformat()
     return [c for c in deck if c.get("due") is None or c["due"] <= today]
 
 
 def progress_payload():
-    p = read_json(STUDENT / "progress.json",
+    d = lang_dir()
+    if d is None:
+        return {"streak": 0, "language": None, "level": None, "unit": 1,
+                "levelPct": 0, "knownWords": 0, "dueCount": 0,
+                "topErrors": [], "history": [0]}
+    p = read_json(d / "progress.json",
                   {"streak": 0, "level": None, "unit": 1, "history": []})
-    known_path = STUDENT / "known_words.txt"
+    known_path = d / "known_words.txt"
     known = len([l for l in known_path.read_text().splitlines() if l.strip()]) \
         if known_path.exists() else 0
     errors = []
-    err_path = STUDENT / "errors.md"
+    err_path = d / "errors.md"
     if err_path.exists():
         for line in err_path.read_text().splitlines():
             m = re.match(r"^(\d+)[x×]\s*\|\s*([^|]+?)\s*\|\s*(.+)$", line.strip())
@@ -67,7 +83,7 @@ def progress_payload():
     errors.sort(key=lambda e: -e["count"])
     history = [h["known_words"] for h in p.get("history", []) if "known_words" in h]
     return {
-        "streak": p.get("streak", 0), "level": p.get("level"),
+        "streak": p.get("streak", 0), "language": d.name, "level": p.get("level"),
         "unit": p.get("unit", 1), "levelPct": round((p.get("unit", 1) - 1) / 12 * 100),
         "knownWords": known, "dueCount": len(due_cards()),
         "topErrors": errors[:3], "history": history or [known],
@@ -126,7 +142,10 @@ class Handler(SimpleHTTPRequestHandler):
         except json.JSONDecodeError:
             return self._json({"error": "bad json"}, 400)
         if self.path == "/api/deck":
-            data = read_json(STUDENT / "cards.json", {"cards": []})
+            d = lang_dir()
+            if d is None:
+                return self._json({"error": "no student data yet"}, 400)
+            data = read_json(d / "cards.json", {"cards": []})
             today = date.today()
             graded = 0
             for r in body.get("results", []):
@@ -134,7 +153,7 @@ class Handler(SimpleHTTPRequestHandler):
                     if card.get("id") == r.get("id"):
                         srs.review(card, int(r["grade"]), today)
                         graded += 1
-            srs.save(STUDENT / "cards.json", data)
+            srs.save(d / "cards.json", data)
             write_event("flashcards", {"graded": graded, **body})
             self._json({"ok": True, "graded": graded})
         elif self.path == "/api/quiz":

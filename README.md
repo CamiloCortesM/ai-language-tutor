@@ -8,7 +8,13 @@ Turn any AI coding agent (Claude Code, Codex, Cursor…) into a personal languag
 
 1. Clone (or download) this repo.
 2. Open your AI agent in the folder — **no terminal needed**: in the Claude desktop app, open the folder with **Cowork**; or use Claude Code, Codex, Cursor, etc.
-3. Say **"let's start"** — you'll get a placement test and a profile. From then on, one word runs your daily class: **"session"**.
+3. Say **"let's start"** — the tutor gives you a **placement test**: a friendly 15-minute chat (a few questions about you, then short tasks that adapt to how you do) that finds your real CEFR level and creates your profile. No studying, no preparation — just answer honestly. From then on, one word runs your daily class: **"session"**.
+
+Want a language other than English? Just say so — *"I speak Spanish and I want to learn French"* — and the tutor sets it up: it generates the French curriculum right in your copy (level by level, marked as generated), creates your French profile, and teaches you exactly the same way.
+
+## Learning more than one language
+
+Yes — each language is fully independent: its own deck, streak, level, error log and progress, in its own folder (`student/english/`, `student/french/`…). Say **"switch to French"** and everything — sessions, flashcards, dashboard — follows. Your profile (name, native language, daily minutes) is shared; nothing else is.
 
 Requirements: any AI coding agent + Python 3. Works on macOS, Windows and Linux.
 
@@ -39,9 +45,11 @@ student.example/     template for your data — your real student/ folder is nev
 
 **Shortcuts:** in Claude Code, Cursor, OpenCode and Gemini CLI you can type **/start** and **/session**. In any other agent (Codex, Cowork, …) just say the words — **"let's start"** and **"session"** work everywhere, because `AGENTS.md` defines them.
 
-## Privacy
+## Privacy & API keys
 
 Everything runs on your machine. Your profile, errors and progress live in `student/` (gitignored). No accounts, no telemetry, no server beyond `localhost`.
+
+**API keys (all optional):** the default stack needs **zero keys** — free neural voices via edge-tts, free browser speech recognition. If you choose a paid voice (OpenAI/ElevenLabs), provide the key **only as an environment variable** in your shell profile (`export OPENAI_API_KEY=...`). Never write keys into any file inside this folder and never paste them into the chat — anything in the folder or the conversation can be read by the AI agent. The tools only ever send the key to its provider over HTTPS; it is never written to disk, cached, or committed.
 
 ## License
 

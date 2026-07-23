@@ -21,8 +21,29 @@ from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CARDS = ROOT / "student" / "cards.json"
-PROGRESS = ROOT / "student" / "progress.json"
+STUDENT = ROOT / "student"
+
+
+def lang_dir():
+    """Active language folder inside student/ (one folder per language studied)."""
+    active = STUDENT / "active.txt"
+    if active.exists():
+        d = STUDENT / active.read_text().strip()
+        if d.is_dir():
+            return d
+    dirs = [d for d in STUDENT.iterdir()
+            if d.is_dir() and not d.name.startswith(".")] if STUDENT.exists() else []
+    if len(dirs) == 1:
+        return dirs[0]
+    sys.exit("no active language folder — write its name to student/active.txt (e.g. 'english')")
+
+
+def cards_path():
+    return lang_dir() / "cards.json"
+
+
+def progress_path():
+    return lang_dir() / "progress.json"
 
 W = [0.4872, 1.4003, 3.7145, 13.8206, 5.1618, 1.2298, 0.8975, 0.031,
      1.6474, 0.1367, 1.0461, 2.1072, 0.0793, 0.3246, 1.587, 0.2272, 2.8755]
@@ -68,17 +89,17 @@ def review(card, grade, today):
 
 
 def cmd_due(today):
-    deck = load(CARDS, {"cards": []})["cards"]
+    deck = load(cards_path(), {"cards": []})["cards"]
     due = [c for c in deck if c.get("due") is None or c["due"] <= today.isoformat()]
     print(json.dumps(due, indent=2, ensure_ascii=False))
 
 
 def cmd_grade(card_id, grade, today):
-    data = load(CARDS, {"cards": []})
+    data = load(cards_path(), {"cards": []})
     for card in data["cards"]:
         if card["id"] == card_id:
             interval = review(card, grade, today)
-            save(CARDS, data)
+            save(cards_path(), data)
             print(json.dumps({"id": card_id, "next_due": card["due"], "interval_days": interval}))
             return
     sys.exit(f"no card with id {card_id}")
@@ -88,7 +109,7 @@ def cmd_add(today):
     new = json.loads(sys.stdin.read())
     if isinstance(new, dict):
         new = [new]
-    data = load(CARDS, {"cards": []})
+    data = load(cards_path(), {"cards": []})
     for card in new:
         card.setdefault("id", uuid.uuid4().hex[:8])
         card.setdefault("last_review", None)
@@ -96,12 +117,12 @@ def cmd_add(today):
         card.setdefault("reps", 0)
         card.setdefault("lapses", 0)
         data["cards"].append(card)
-    save(CARDS, data)
+    save(cards_path(), data)
     print(f"added {len(new)} card(s), deck now {len(data['cards'])}")
 
 
 def cmd_streak(today):
-    p = load(PROGRESS, {"streak": 0, "last_active": None, "level": None, "unit": 1, "history": []})
+    p = load(progress_path(), {"streak": 0, "last_active": None, "level": None, "unit": 1, "history": []})
     last = p.get("last_active")
     if last != today.isoformat():
         if last == (today - timedelta(days=1)).isoformat():
@@ -109,12 +130,12 @@ def cmd_streak(today):
         else:
             p["streak"] = 1
         p["last_active"] = today.isoformat()
-        save(PROGRESS, p)
+        save(progress_path(), p)
     print(json.dumps({"streak": p["streak"], "last_active": p["last_active"]}))
 
 
 def cmd_stats(today):
-    deck = load(CARDS, {"cards": []})["cards"]
+    deck = load(cards_path(), {"cards": []})["cards"]
     due = sum(1 for c in deck if c.get("due") is None or c["due"] <= today.isoformat())
     print(json.dumps({"cards": len(deck), "due": due,
                       "new": sum(1 for c in deck if c.get("last_review") is None)}))

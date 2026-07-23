@@ -45,11 +45,13 @@ learning-language/
 │       └── l1-notes/
 │           └── spanish.md     # typical errors for Spanish speakers (phonology, grammar, false friends)
 ├── student/               # learner data (gitignored)
-│   ├── profile.md         # target language, level, L1, goals, interests, daily time, voice config
-│   ├── progress.json      # streak, sessions, current unit, history
-│   ├── errors.md          # recurring-error log (feeds lessons and cloze cards)
-│   ├── known_words.txt    # known lemmas (drives the comprehensibility ratio)
-│   └── cards.json         # SRS deck (cloze cards with FSRS state)
+│   ├── profile.md         # shared: name, L1, languages studied, daily time, voice config
+│   ├── active.txt         # which language is active ("switch to X" updates it)
+│   └── <language>/        # one folder PER language studied — fully independent:
+│       ├── progress.json  #   streak, level, current unit, history
+│       ├── errors.md      #   recurring-error log (feeds lessons and cloze cards)
+│       ├── known_words.txt #  known lemmas (drives the comprehensibility ratio)
+│       └── cards.json     #   SRS deck (cloze cards with FSRS state)
 ├── student.example/       # commented template of all of the above
 ├── apps/                  # self-contained HTML apps (no frameworks, no build)
 │   ├── flashcards.html    # SRS review UI: flip cards, Again/Hard/Good/Easy, browser TTS
