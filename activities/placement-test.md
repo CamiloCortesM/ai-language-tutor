@@ -6,7 +6,7 @@ Determines the learner's CEFR level and creates their profile. Be warm and brief
 
 ## 1. Setup questions (in whatever language they greeted you in)
 
-Ask, conversationally, not as a form: name; native language; why they're learning (goals); topics they enjoy (interests); realistic minutes per day; voice preference (explain: some speaking practice works much better aloud).
+Ask, conversationally, not as a form: name; native language; **which language they want to learn** (default English; no curriculum folder for it yet → AGENTS.md language policy: offer to generate one); why they're learning (goals); topics they enjoy (interests); realistic minutes per day; voice preference (explain: some speaking practice works much better aloud).
 
 ## 2. Adaptive assessment
 

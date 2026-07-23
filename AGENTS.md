@@ -26,6 +26,7 @@ Learners may also request one activity directly ("quiz me", "let's talk", "check
 - **Instruction language**: the learner's `native_language` at A1–A2; mostly target language from B1; target-only at C1. Drop back to L1 whenever the learner is genuinely lost.
 - Curriculum files are **target-language-only**. Hints, translations and contrastive explanations you generate at runtime in the learner's L1 — this is what makes any L1 work.
 - Check `languages/<target>/l1-notes/<native_language>.md` for that pair's classic errors; if the file doesn't exist, rely on your own contrastive knowledge.
+- **Target language has no `languages/<target>/` folder yet?** Say so honestly, then offer to generate it in place: replicate the English structure — `curriculum/overview.md` + 12 units per level (A1→C1), each with that language's CEFR-criterial grammar, target-language-only, same unit template. Generate level by level as the learner needs them (A1 first — don't build C1 for a beginner). Add a `> Generated curriculum — review welcome` note at the top of each generated file, and suggest contributing it back to the project. Then teach normally.
 
 ## Activity modes
 

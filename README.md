@@ -2,7 +2,7 @@
 
 Turn any AI coding agent (Claude Code, Codex, Cursor…) into a personal language tutor with memory. CEFR-based curriculum from A1 to C1, spaced repetition, real speaking practice, and progress that persists between sessions — all in plain files, no accounts, no servers.
 
-**Status: work in progress.** English (from any native language) ships first.
+**Status: work in progress.** The English curriculum (A1→C1, 60 units) ships first — and it works **from any native language**: the tutor explains, hints and translates in yours. Want to learn a different language? Ask your tutor — it will offer to generate that curriculum for you in place (and you can contribute it back).
 
 ## Quick start
 
