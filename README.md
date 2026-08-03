@@ -1,5 +1,9 @@
 # AI Language Tutor
 
+<p align="center">
+  <img src="assets/tutor-mascot.png" alt="AI Language Tutor mascot reading a book" width="240">
+</p>
+
 Turn any AI coding agent into a personal language tutor with memory — a full CEFR course from A1 to C1 that lives in a folder.
 
 No accounts, no subscriptions, no servers. The **agent is the tutor** (it teaches, corrects, converses and examines you), **plain files are the memory** (your level, errors, vocabulary and streak persist between sessions), and **one small script is the clock** (FSRS, the modern spaced-repetition algorithm). Everything is built on evidence-based language pedagogy — see [`docs/methodology.md`](docs/methodology.md).
