@@ -6,6 +6,7 @@ Commands:
   due                    print due cards as JSON
   grade <id> <1-4>       apply a review grade (1 Again, 2 Hard, 3 Good, 4 Easy)
   add                    add cards from a JSON array on stdin
+  img <id> <query>       fetch a CC image (Openverse) for a card -> student/<lang>/img/
   streak                 update and print the streak (call once per study day)
   stats                  deck counts
   selfcheck              run internal assertions on temp data
@@ -121,6 +122,36 @@ def cmd_add(today):
     print(f"added {len(new)} card(s), deck now {len(data['cards'])}")
 
 
+def cmd_img(card_id, query):
+    import urllib.parse
+    import urllib.request
+    if not query:
+        sys.exit("usage: img <card-id> <search query>")
+    data = load(cards_path(), {"cards": []})
+    card = next((c for c in data["cards"] if c["id"] == card_id), None)
+    if card is None:
+        sys.exit(f"no card with id {card_id}")
+    ua = {"User-Agent": "learning-language-tutor/1.0"}
+    api = "https://api.openverse.org/v1/images/?" + urllib.parse.urlencode(
+        {"q": query, "page_size": 3, "mature": "false"})
+    hits = json.loads(urllib.request.urlopen(
+        urllib.request.Request(api, headers=ua), timeout=15).read())["results"]
+    if not hits:
+        sys.exit(f"no images found for {query!r}")
+    pick = hits[0]
+    raw = urllib.request.urlopen(
+        urllib.request.Request(pick.get("thumbnail") or pick["url"], headers=ua),
+        timeout=30).read()
+    out = lang_dir() / "img" / f"{card_id}.jpg"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(raw)
+    card["image"] = out.name
+    if pick.get("attribution"):
+        card["image_credit"] = pick["attribution"]
+    save(cards_path(), data)
+    print(json.dumps({"id": card_id, "image": str(out.relative_to(ROOT))}, ensure_ascii=False))
+
+
 def cmd_streak(today):
     p = load(progress_path(), {"streak": 0, "last_active": None, "level": None, "unit": 1, "history": []})
     last = p.get("last_active")
@@ -170,6 +201,10 @@ def main():
         cmd_grade(args[1], int(args[2]), today)
     elif cmd == "add":
         cmd_add(today)
+    elif cmd == "img":
+        if len(args) < 3:
+            sys.exit("usage: img <card-id> <search query>")
+        cmd_img(args[1], " ".join(args[2:]))
     elif cmd == "streak":
         cmd_streak(today)
     elif cmd == "stats":

@@ -45,7 +45,7 @@ Key rule: in the three meaning strands the material must be **easy** (fluency an
 
 Note: Spanish speakers start with an advantage — thousands of Latin/academic cognates in formal registers — but the high-frequency Germanic vocabulary (phrasal verbs, short words) must be learned like anyone else.
 
-**Review evidence:** the **testing effect / retrieval practice** (actively recalling > re-reading) plus the **spacing effect** are among the most robust findings in learning psychology. SRS systems (Anki) that surface difficult cards more often consistently beat massed review and paper flashcards. **Actionable:** SRS with active recall, cards with audio and in-context examples (not isolated word→translation), 15–20 min/day.
+**Review evidence:** the **testing effect / retrieval practice** (actively recalling > re-reading) plus the **spacing effect** are among the most robust findings in learning psychology. SRS systems that surface difficult cards more often consistently beat massed review and paper flashcards. **Actionable:** SRS with active recall, cards with audio and in-context examples (not isolated word→translation), 15–20 min/day.
 
 ## 5. Concrete techniques with support
 

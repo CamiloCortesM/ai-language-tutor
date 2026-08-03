@@ -2,7 +2,7 @@
 
 Turn any AI coding agent into a personal language tutor with memory — a full CEFR course from A1 to C1 that lives in a folder.
 
-No accounts, no subscriptions, no servers. The **agent is the tutor** (it teaches, corrects, converses and examines you), **plain files are the memory** (your level, errors, vocabulary and streak persist between sessions), and **one small script is the clock** (FSRS spaced repetition, the modern Anki algorithm). Everything is built on evidence-based language pedagogy — see [`docs/methodology.md`](docs/methodology.md).
+No accounts, no subscriptions, no servers. The **agent is the tutor** (it teaches, corrects, converses and examines you), **plain files are the memory** (your level, errors, vocabulary and streak persist between sessions), and **one small script is the clock** (FSRS, the modern spaced-repetition algorithm). Everything is built on evidence-based language pedagogy — see [`docs/methodology.md`](docs/methodology.md).
 
 Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anything that reads `AGENTS.md`. macOS, Windows and Linux.
 
@@ -11,9 +11,9 @@ Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anyt
 - **Placement test** — a friendly ~15-minute adaptive chat that finds your real CEFR level and builds your profile. No preparation needed.
 - **Daily sessions** — one word (`session`) plans your day: spaced review, comprehensible reading, conversation, writing, pronunciation… balanced across the week and fitted to the minutes you have.
 - **Real curriculum** — 60 CEFR units for English (A1→C1): criterial grammar, vocabulary, functions and Cambridge-style level exams.
-- **Spaced repetition** — cloze flashcards in context, scheduled with FSRS, generated from *your* errors and readings.
-- **Speaking that counts** — conversation, fluency drills and spoken exams by voice, always with a real voice AI: your agent's voice mode, or ChatGPT/Claude voice through a lesson bridge that syncs back into your memory.
-- **Browser apps** — flashcards, quizzes, assisted reader with read-along audio, call mode and a progress dashboard. Self-contained HTML, served locally.
+- **Spaced repetition** — word-first flashcards: the word, how it sounds and a real example on the front; the meaning in your language (plus a picture when it helps) on the back. Scheduled with FSRS, generated from *your* errors and readings.
+- **Speaking that counts** — conversation, fluency drills and spoken exams use the current agent's integrated voice when available. An optional Lesson Pass bridge supports another voice AI when needed.
+- **Browser apps** — flashcards, quizzes, assisted reader with read-along audio and a progress dashboard. Self-contained HTML, served locally.
 - **Natural voices, free** — neural TTS via edge-tts, no key or account. Paid voices (OpenAI, ElevenLabs) optional, never required.
 - **Any native language, any target** — the tutor explains in *your* language; English ships complete, and other target languages are generated in place on request.
 - **Private by design** — everything runs and stays on your machine.
@@ -32,7 +32,7 @@ From then on, your daily class is one word: **`session`**. In Claude Code, Curso
 
 The tutor reads your memory, greets you with your streak and due cards, and runs a plan shaped to your daily minutes — for example: 10' flashcard review → 15' reading at 95–98% known words → 15' spoken roleplay → 5' grammar targeting your most repeated error. Every activity writes back what it learned about you: new errors become flashcards, mastered words unlock harder texts, and tomorrow's class starts where today's ended.
 
-Speaking steps are enforced, not optional — you cannot pass B1 without a spoken exam. Spoken lessons always happen with a real voice AI: your agent's own voice mode if it has one, or the **voice bridge** — the tutor prints a *Lesson Pass*, you run the lesson by voice in **ChatGPT or Claude** ([5-minute setup](portable/voice-tutor.md)), and its *Lesson Report* syncs back into your memory.
+Speaking steps are enforced, not optional — you cannot pass B1 without a spoken exam. When your agent has integrated voice, turn it on and do the lesson there. If voice is off, the tutor reminds you before a speaking step; if it is unavailable or you prefer another AI, use the optional [voice bridge](portable/voice-tutor.md).
 
 ## Languages
 
@@ -48,7 +48,7 @@ docs/                methodology, architecture, and the research behind them
 activities/          the 12 lesson types the tutor can run (plain markdown)
 languages/english/   curriculum: 60 CEFR units + notes per native language
 apps/                browser apps: flashcards, quiz, reader, dashboard
-portable/            voice bridge for spoken lessons in ChatGPT/Claude
+portable/            optional voice bridge for another voice AI
 tools/               srs.py (FSRS) · serve.py (local API) · tts.py (voices)
 student.example/     template for your data — your real student/ is gitignored
 ```

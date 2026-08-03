@@ -15,6 +15,8 @@ API:
   POST /api/quiz      quiz results -> event
   GET  /api/text      contents of student/reading-current.json (tutor writes it)
   POST /api/text      {"addWord": ..} -> queued for the tutor, event
+  GET  /api/dictation contents of student/dictation-current.json (tutor writes it)
+  GET  /api/img/<f>   card image from student/<lang>/img/
 """
 import json
 import re
@@ -134,6 +136,22 @@ class Handler(SimpleHTTPRequestHandler):
         elif self.path == "/api/text":
             text = read_json(STUDENT / "reading-current.json", None)
             self._json(text or {"error": "no text prepared"}, 200 if text else 404)
+        elif self.path == "/api/dictation":
+            dic = read_json(STUDENT / "dictation-current.json", None)
+            self._json(dic or {"error": "no dictation prepared"}, 200 if dic else 404)
+        elif self.path.startswith("/api/img/"):
+            d = lang_dir()
+            name = Path(urllib.parse.unquote(self.path[len("/api/img/"):])).name  # basename only — no traversal
+            f = d / "img" / name if d else None
+            if f and f.is_file():
+                body = f.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "image/jpeg")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            else:
+                self._json({"error": "no image"}, 404)
         else:
             super().do_GET()
 

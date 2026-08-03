@@ -9,15 +9,16 @@ Serve + open `flashcards.html` and wait on the event file per AGENTS.md §HTML a
 ## Chat protocol (no browser)
 
 1. `python3 tools/srs.py due` → take up to ~12 cards (oldest due first).
-2. Per card, show front + hint only:
+2. Per card, show the word side only:
 
-   > **Can I ___ your pen? I forgot mine.**
-   > *(pedir prestado)*
+   > **borrow** · *bó·rrou* · /ˈbɒr.əʊ/ · verb
+   > *Can I **borrow** your pen? I forgot mine.*
 
-3. Learner answers. Reveal the full card: sentence with the answer marked, `word /ipa/ · pos`, definition, translation.
-4. Ask for an honest self-grade — **1 Again · 2 Hard · 3 Good · 4 Easy** — with next-interval hints. A correct-but-slow answer is Hard, not Good. A synonym that fits is fine language but a miss for *this* card ("'use' works! The target was *borrow* — grade yourself on that").
-5. `python3 tools/srs.py grade <id> <n>` after each.
-6. With `voice: always` or on request: say the sentence aloud (TTS/voice mode) before showing it — listening + recall in one.
+3. Learner says what it means (L1 is fine) — better yet, meaning + a quick sentence of their own.
+4. Reveal the other side: meaning in their L1, simple definition, translation of the example, other senses if the card has them.
+5. Ask for an honest self-grade — **1 Again · 2 Hard · 3 Good · 4 Easy** — with next-interval hints. Instant and sure = Good/Easy; slow or fuzzy = Hard; wrong or blank = Again. Knowing a *different* sense than the card's is a miss for *this* card ("as = 'mientras' is real, but this card is as = 'como (rol)' — grade on that").
+6. `python3 tools/srs.py grade <id> <n>` after each.
+7. On request: TTS the word before the reveal (ear-check the pronunciation) or the example sentence after it.
 
 ## After the run
 

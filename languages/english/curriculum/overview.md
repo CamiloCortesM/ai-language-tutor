@@ -1,6 +1,6 @@
 # English curriculum — overview (A1 → C1)
 
-Built from the CEFR / English Grammar Profile / Oxford wordlist research in `docs/research/cefr-syllabus.md`. 12 units per level; grammar listed at a unit is *criterial* (first taught there) and recycled forever after.
+Built from the CEFR / English Grammar Profile / Oxford wordlist research in `languages/english/cefr-syllabus.md`. 12 units per level; grammar listed at a unit is *criterial* (first taught there) and recycled forever after.
 
 | Level | Units | Guided hours (cum.) | Productive vocab target | Exam gate (simulated) |
 |---|---|---|---|---|

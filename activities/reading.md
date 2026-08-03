@@ -10,14 +10,17 @@
 
 ## Run it
 
-**App mode (preferred with a browser):** write `student/reading-current.json` (format in AGENTS.md §HTML apps), open `reader.html`, wait on the event(s). The learner reads with tap-to-gloss words and can hit **▶ Read to me** — the browser voice reads paragraph by paragraph while the text highlights along (reading-while-listening).
+**App mode (preferred with a browser):** write `student/reading-current.json` (format in AGENTS.md §HTML apps), open `reader.html`, wait on the event(s). The learner reads with tap-to-gloss words and can hit **▶ Read to me** — the browser voice reads paragraph by paragraph while the text highlights along (reading-while-listening). Two more affordances:
+
+- **🎤 Shadow** — sentence-by-sentence at reduced speed, self-paced (Next/Replay, space to advance). This IS pass 3 of the technique below; point the learner at the button instead of the paragraph 🔊 for shadowing.
+- **Every word is tappable.** Glossary words show their gloss; any other word offers **💬 Ask the tutor**, which fires an `askWord` event (word + the sentence it came from). **Answer asks as they arrive**: brief L1 gloss + why it's used that way in that sentence, then delete the event and keep waiting. Events also carry the cumulative `added`/`asks` arrays, so the final event always holds the whole session — dedupe against what you already handled.
 
 **Coach the three-pass technique** (methodology §10 — teach it the first time, then one-line reminders):
 1. Read once straight through, no stopping — just get the story.
 2. Second pass: guess unknown words from context first; tap ONLY the ones that still block understanding.
 3. **Read to me** + read along aloud, imitating the voice (shadowing) — ear and mouth in one pass.
 
-**Chat mode:** present the text (title + level + ~minutes). Read-aloud options, learner's choice: with agent voice mode, read it yourself while they follow the text in chat; otherwise `python3 tools/tts.py say "<paragraph>"` paragraph by paragraph (cross-platform, best free voice available).
+**Chat mode:** present the text (title + level + ~minutes). Read-aloud via `python3 tools/tts.py say "<paragraph>"` paragraph by paragraph (cross-platform, best free voice available).
 
 Rotate the listening arrangement across sessions — each trains something different:
 1. **Read-along** (default): audio + text together — links sound to spelling, trains prosody.
@@ -25,9 +28,9 @@ Rotate the listening arrangement across sessions — each trains something diffe
 3. **Read then listen**: silent read, questions, then audio pass at full speed.
 
 Then, in any mode:
-- Any word the learner asks about → simple target-language definition + L1 translation + one extra example → **cloze card** from the sentence where they found it (app does this automatically via the + button).
+- Any word the learner asks about → simple target-language definition + L1 translation + one extra example → **card** with the sentence where they found it as its example (app does this automatically via the + button).
 - 2–3 comprehension questions — one literal, one inferential, (B1+) one opinion answered in the target language.
-- Optional 30-second oral summary (counts toward speaking; great for `voice: always`).
+- Optional 30-second oral summary (counts toward speaking).
 
 ## Write-backs
 

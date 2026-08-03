@@ -6,7 +6,7 @@ Run when all 12 units of the level are done, or on request as practice (practice
 
 ## Build the exam
 
-Model it on the level's Cambridge format (`docs/research/cefr-syllabus.md`): A1/A2 → Key-style (reading/writing + listening + speaking) · B1 → Preliminary · B2 → First (adds Use of English: word formation, key-word transformation, open cloze) · C1 → Advanced. Scale to ~half the parts of the real exam per paper — enough signal, not a whole afternoon. Content draws on the level's units; nothing above level.
+Model it on the level's official exam format for the active language (`languages/<target>/cefr-syllabus.md`). English → Cambridge: A1/A2 → Key-style (reading/writing + listening + speaking) · B1 → Preliminary · B2 → First (adds Use of English: word formation, key-word transformation, open cloze) · C1 → Advanced. Other languages → the exam mapped in their syllabus (DELF/DALF, Goethe, JLPT…). Scale to ~half the parts of the real exam per paper — enough signal, not a whole afternoon. Content draws on the level's units; nothing above level.
 
 Exam conditions: no hints, no corrections mid-paper, time limits stated per part (soft-enforced). Say so up front.
 

@@ -3,7 +3,7 @@
 
 Provider picked by TUTOR_TTS env var, or auto-detected (free first):
   edge        FREE neural voices — `pip install edge-tts`, no key, no account
-              (voice via TUTOR_TTS_VOICE, default "en-GB-SoniaNeural")
+              (voice via TUTOR_TTS_VOICE, default "en-US-AndrewNeural")
   openai      needs OPENAI_API_KEY      (model gpt-4o-mini-tts; default voice "nova")
   elevenlabs  needs ELEVENLABS_API_KEY  (voice id via TUTOR_TTS_VOICE, default "Rachel")
   say         macOS built-in — no key, no cost, robotic (last resort)
@@ -29,7 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "student" / ".tts-cache"
 
-DEFAULT_VOICE = {"edge": "en-GB-SoniaNeural", "openai": "nova",
+DEFAULT_VOICE = {"edge": "en-US-AndrewNeural", "openai": "nova",
                  "elevenlabs": "21m00Tcm4TlvDq8ikWAM"}  # 21m0… = Rachel
 
 

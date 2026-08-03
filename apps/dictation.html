@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutor — Dictation</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand b { font-family: var(--font-display); font-size: 17px; }
+  .brand span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+  main { width: 100%; max-width: 620px; margin: 0 auto; padding: 32px 22px 80px; box-sizing: border-box; }
+  h1 { font-family: var(--font-text); font-size: 30px; line-height: 1.2; margin: 0 0 6px; }
+  .how { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin: 0 0 28px; }
+  .item { border-top: 1px solid var(--line); padding: 20px 0; }
+  .n { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); }
+  audio { width: 100%; margin: 8px 0 2px; }
+  summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent-strong); padding: 6px 0; }
+  .en { font-family: var(--font-text); font-size: 20px; line-height: 1.5; margin: 6px 0 2px; }
+  .es { font-size: 15px; font-style: italic; color: var(--ink-soft); }
+  .note { font-size: 14px; color: var(--ink-soft); background: var(--accent-soft); border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 10px; }
+  .empty { color: var(--ink-faint); padding: 40px 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>Tutor</b><span>Dictation</span></div>
+</header>
+<main>
+  <h1 id="title"></h1>
+  <p class="how">Listen as many times as you need — the player has play, scrub and (right-click) loop.
+     Write each sentence <b>in the chat</b>, then open “show text” to check yourself. Never the other way round.</p>
+  <div id="items"><p class="empty">Loading…</p></div>
+</main>
+<script>
+fetch('/api/dictation').then(r => r.ok ? r.json() : null).then(d => {
+  if (!d) { document.getElementById('items').innerHTML =
+    '<p class="empty">No dictation prepared. The tutor writes <code>student/dictation-current.json</code> first.</p>'; return; }
+  document.title = 'Tutor — ' + (d.title || 'Dictation');
+  document.getElementById('title').textContent = d.title || 'Dictation';
+  document.getElementById('items').innerHTML = (d.sentences || []).map((s, i) => `
+    <div class="item">
+      <div class="n">${d.label || 'Sentence'} ${i + 1}</div>
+      <audio controls preload="none" src="/api/tts?text=${encodeURIComponent(s.en)}"></audio>
+      <details>
+        <summary>show text</summary>
+        <div class="en">${s.en}</div>
+        <div class="es">${s.es || ''}</div>
+        ${s.note ? `<div class="note">${s.note}</div>` : ''}
+      </details>
+    </div>`).join('');
+});
+</script>
+</body>
+</html>

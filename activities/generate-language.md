@@ -11,7 +11,9 @@ Turns the repo's structure into a curriculum factory: English is the reference i
 
 ## 2. Generate the curriculum — level by level, never all at once
 
-Create `languages/<target>/curriculum/overview.md` (adapt the English one: guided hours, vocab targets, that language's official exam per level — DELF/DALF for French, Goethe for German, JLPT-mapped for Japanese, etc.).
+First create `languages/<target>/cefr-syllabus.md` following the structure of `languages/english/cefr-syllabus.md`: per-level can-do, **that language's** CEFR-criterial grammar, vocab ranges, and the official exam formats — DELF/DALF for French, Goethe for German, JLPT-mapped for Japanese, etc. It is the source the units, placement test and exam simulator read.
+
+Then `languages/<target>/curriculum/overview.md` (adapt the English one: guided hours, vocab targets, exam per level).
 
 Then generate ONLY the level the learner needs now (A1 for a beginner; their placement level otherwise), 12 units, using the English units as the structural template:
 

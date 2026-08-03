@@ -23,6 +23,9 @@
   .para p.reading { background: var(--accent-soft); border-radius: 8px; }
   .w { font-family: inherit; font-size: inherit; line-height: inherit; border: none; padding: 0 2px; margin: 0; cursor: pointer; border-radius: 5px; background: transparent; color: var(--ink); border-bottom: 2px dotted var(--accent); }
   .w:hover, .w.open { background: var(--accent-soft); }
+  .w.plain { border-bottom-color: transparent; }
+  .s { border-radius: 6px; }
+  .s.reading { background: var(--accent-soft); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
   .pop { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); width: min(420px, calc(100vw - 32px)); background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); padding: 18px 20px; z-index: 20; animation: tut-rise .2s var(--ease); box-sizing: border-box; }
   .pop-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
   .pop-head b { font-family: var(--font-text); font-size: 22px; }
@@ -46,7 +49,10 @@
 <body>
 <header>
   <div class="brand"><b>Tutor</b><span>Reader</span></div>
-  <button class="listen-all" id="listen-all">▶ Read to me</button>
+  <div style="display:flex;gap:8px">
+    <button class="listen-all" id="shadow-btn">🎤 Shadow</button>
+    <button class="listen-all" id="listen-all">▶ Read to me</button>
+  </div>
 </header>
 <main id="main">
   <div class="kicker"><span id="level"></span> · <span id="mins"></span> min read</div>
@@ -60,12 +66,20 @@
   <div class="ex" id="pop-ex"></div>
   <button class="add" id="pop-add">+ Add to deck</button>
   <span class="added-chip hidden" id="pop-added">✓ In your deck</span>
+  <button class="add" id="pop-ask">💬 Ask the tutor</button>
+  <span class="added-chip hidden" id="pop-asked">✓ Sent — answer in the chat</span>
 </div>
 <footer>
-  <div class="foot">
+  <div class="foot" id="readfoot">
     <div class="track" role="progressbar" aria-label="Reading progress"><div id="readbar"></div></div>
     <span class="pct"><span id="pct">0</span>% read</span>
     <span class="col"><span id="collected">0</span> words collected</span>
+  </div>
+  <div class="foot hidden" id="shadowfoot">
+    <span class="pct" style="flex:1">🎤 listen → repeat aloud → next</span>
+    <button class="listen-all" id="sh-rep" aria-label="Replay sentence">↻ Replay</button>
+    <button class="listen-all" id="sh-next" aria-label="Next sentence">Next ▸</button>
+    <button class="listen-all" id="sh-exit" aria-label="Exit shadowing">✕</button>
   </div>
 </footer>
 <script>
@@ -89,18 +103,19 @@
       'Rosa looks at the line from the counter and smiles. She is proud of something very simple: every morning, her little oven wakes up the whole neighborhood.',
     ],
   };
-  let story = DEMO, open = null, added = [], live = false;
+  let story = DEMO, open = null, openSentence = '', added = [], asked = [], live = false;
   const $ = id => document.getElementById(id);
   const esc = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
 
   let premiumTTS = true, currentAudio = null;
-  async function speak(text, onend) {
+  async function speak(text, onend, rate) {
     if (currentAudio) { currentAudio.pause(); currentAudio = null; }
     if (premiumTTS) {
       try {
         const r = await fetch('/api/tts?text=' + encodeURIComponent(text));
         if (r.status === 200) {
           currentAudio = new Audio(URL.createObjectURL(await r.blob()));
+          if (rate) currentAudio.playbackRate = rate; // browsers preserve pitch by default
           if (onend) currentAudio.onended = onend;
           currentAudio.play();
           return;
@@ -110,10 +125,22 @@
     }
     try {
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = story.lang || 'en-GB'; u.rate = 0.92;
+      u.lang = story.lang || 'en-US'; u.rate = rate || 0.92;
       if (onend) u.onend = onend;
       speechSynthesis.cancel(); speechSynthesis.speak(u);
     } catch (e) {}
+  }
+
+  // Sentence split for shadowing; merges false splits after common titles.
+  // ponytail: decimals ("4.5") still split — irrelevant in A-level texts, revisit if a text ever has them.
+  function sentences(text) {
+    const parts = text.match(/[^.!?…]+[.!?…]+[”"')\]]*\s*|[^.!?…]+\s*$/g) || [text];
+    const out = [];
+    for (const p of parts) {
+      if (out.length && /\b(?:Mr|Mrs|Ms|Dr|St)\.\s*$/.test(out[out.length - 1])) out[out.length - 1] += p;
+      else out.push(p);
+    }
+    return out;
   }
 
   function render() {
@@ -121,31 +148,36 @@
     $('level').textContent = story.level || '';
     $('mins').textContent = story.minutes || Math.max(1, Math.round(story.paragraphs.join(' ').split(' ').length / 90));
     $('paras').innerHTML = story.paragraphs.map((text, pi) => {
-      const tokens = text.split(/(\p{L}+)/u).filter(t => t.length).map(t => {
-        const key = t.toLowerCase();
-        return story.glossary[key]
-          ? `<button class="w" data-w="${esc(key)}" aria-label="New word: ${esc(t)}. Tap for definition.">${esc(t)}</button>`
-          : esc(t);
+      const spans = sentences(text).map((s, si) => {
+        const tokens = s.split(/(\p{L}+)/u).filter(t => t.length).map(t => {
+          if (!/\p{L}/u.test(t)) return esc(t);
+          const key = t.toLowerCase();
+          const glossed = !!story.glossary[key];
+          return `<button class="w${glossed ? '' : ' plain'}" data-w="${esc(key)}" aria-label="${glossed ? 'New word' : 'Word'}: ${esc(t)}. Tap for ${glossed ? 'definition' : 'help'}.">${esc(t)}</button>`;
+        }).join('');
+        return `<span class="s" data-p="${pi}" data-s="${si}">${tokens}</span>`;
       }).join('');
       return `<div class="para">
         <button class="pspeak" data-p="${pi}" aria-label="Read paragraph aloud">🔊</button>
-        <p id="p-${pi}">${tokens}</p>
+        <p id="p-${pi}">${spans}</p>
       </div>`;
     }).join('');
   }
 
-  function showPop(key) {
+  function showPop(key, sentence) {
     const e = story.glossary[key];
-    if (!e) return;
-    open = key;
+    open = key; openSentence = (sentence || '').trim();
     document.querySelectorAll('.w').forEach(w => w.classList.toggle('open', w.dataset.w === key));
     $('pop-word').textContent = key;
-    $('pop-def').textContent = e.def || '';
-    $('pop-l1').textContent = e.l1 || e.es || '';
-    $('pop-ex').textContent = e.example ? '“' + e.example + '”' : '';
-    const isAdded = added.includes(key);
-    $('pop-add').classList.toggle('hidden', isAdded);
-    $('pop-added').classList.toggle('hidden', !isAdded);
+    $('pop-def').textContent = e ? (e.def || '') : '';
+    $('pop-l1').textContent = e ? (e.l1 || e.es || '') : '';
+    // Glossary words show their example; unknown words show the sentence they came from.
+    $('pop-ex').textContent = e ? (e.example ? '“' + e.example + '”' : '') : (openSentence ? '“' + openSentence + '”' : '');
+    const isAdded = added.includes(key), isAsked = asked.some(a => a.word === key);
+    $('pop-add').classList.toggle('hidden', !e || isAdded);
+    $('pop-added').classList.toggle('hidden', !e || !isAdded);
+    $('pop-ask').classList.toggle('hidden', !!e || isAsked);
+    $('pop-asked').classList.toggle('hidden', !!e || !isAsked);
     $('pop').classList.remove('hidden');
   }
 
@@ -167,14 +199,56 @@
     });
   }
 
+  // Shadow mode: sentence-by-sentence, slower, self-paced — the learner repeats aloud between sentences.
+  const SH = { on: false, p: 0, s: 0 };
+  const SHADOW_RATE = 0.85;
+  function shadowPlay() {
+    const el = document.querySelector(`.s[data-p="${SH.p}"][data-s="${SH.s}"]`);
+    if (!el) return shadowExit();
+    document.querySelectorAll('.s.reading').forEach(x => x.classList.remove('reading'));
+    el.classList.add('reading');
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    speak(el.textContent.trim(), null, SHADOW_RATE);
+  }
+  function shadowNext() {
+    if (document.querySelector(`.s[data-p="${SH.p}"][data-s="${SH.s + 1}"]`)) SH.s++;
+    else { SH.p++; SH.s = 0; }
+    if (!document.querySelector(`.s[data-p="${SH.p}"][data-s="${SH.s}"]`)) return shadowExit();
+    shadowPlay();
+  }
+  function shadowEnter() {
+    SH.on = true; SH.p = 0; SH.s = 0;
+    $('readfoot').classList.add('hidden'); $('shadowfoot').classList.remove('hidden');
+    shadowPlay();
+  }
+  function shadowExit() {
+    SH.on = false;
+    document.querySelectorAll('.s.reading').forEach(x => x.classList.remove('reading'));
+    $('shadowfoot').classList.add('hidden'); $('readfoot').classList.remove('hidden');
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+  }
+
   document.addEventListener('click', e => {
     const w = e.target.closest('.w');
     const ps = e.target.closest('.pspeak');
-    if (w) { e.stopPropagation(); showPop(w.dataset.w); return; }
-    if (ps) { e.stopPropagation(); speak(story.paragraphs[+ps.dataset.p]); return; }
+    if (w) { e.stopPropagation(); showPop(w.dataset.w, w.closest('.s')?.textContent); return; }
+    if (ps) { e.stopPropagation(); if (SH.on) shadowExit(); speak(story.paragraphs[+ps.dataset.p]); return; }
+    const s = e.target.closest('.s');
+    if (SH.on && s) { SH.p = +s.dataset.p; SH.s = +s.dataset.s; shadowPlay(); return; }
     if (!e.target.closest('.pop')) closePop();
   });
-  $('listen-all').addEventListener('click', e => { e.stopPropagation(); readAlong(0); });
+  $('listen-all').addEventListener('click', e => { e.stopPropagation(); if (SH.on) shadowExit(); readAlong(0); });
+  $('shadow-btn').addEventListener('click', e => { e.stopPropagation(); if (!SH.on) shadowEnter(); });
+  $('sh-rep').addEventListener('click', e => { e.stopPropagation(); shadowPlay(); });
+  $('sh-next').addEventListener('click', e => { e.stopPropagation(); shadowNext(); });
+  $('sh-exit').addEventListener('click', e => { e.stopPropagation(); shadowExit(); });
+  window.addEventListener('keydown', e => {
+    if (!SH.on) return;
+    if (e.code === 'Space') { e.preventDefault(); shadowNext(); }
+    else if (e.key === 'r' || e.key === 'R') shadowPlay();
+    else if (e.key === 'Escape') shadowExit();
+  });
   $('pop-speak').addEventListener('click', () => speak(open));
   $('pop-add').addEventListener('click', () => {
     if (!open || added.includes(open)) return;
@@ -184,8 +258,20 @@
     $('pop-added').classList.remove('hidden');
     if (live) {
       const e = story.glossary[open];
+      // added/asks ride along cumulatively: the single event file gets overwritten per POST,
+      // so the last event always carries the full session state.
       fetch('/api/text', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addWord: open, def: e.def, example: e.example, l1: e.l1 || '' }) }).catch(() => {});
+        body: JSON.stringify({ addWord: open, def: e.def, example: e.example, l1: e.l1 || '', added, asks: asked }) }).catch(() => {});
+    }
+  });
+  $('pop-ask').addEventListener('click', () => {
+    if (!open || asked.some(a => a.word === open)) return;
+    asked.push({ word: open, sentence: openSentence });
+    $('pop-ask').classList.add('hidden');
+    $('pop-asked').classList.remove('hidden');
+    if (live) {
+      fetch('/api/text', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ askWord: open, sentence: openSentence, added, asks: asked }) }).catch(() => {});
     }
   });
   window.addEventListener('scroll', () => {

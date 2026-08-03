@@ -14,26 +14,30 @@
   .brand span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
   .meta { display: flex; align-items: center; gap: 16px; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
   .streak { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--ink); }
-  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px 32px; width: 100%; max-width: 640px; margin: 0 auto; box-sizing: border-box; }
+  main { flex: 1; display: flex; flex-direction: column; align-items: stretch; justify-content: center; padding: clamp(12px, 3vh, 28px) clamp(12px, 4vw, 24px) clamp(16px, 4vh, 32px); width: 100%; max-width: 780px; margin: 0 auto; box-sizing: border-box; }
   .scene { perspective: 1400px; width: 100%; }
-  .card { position: relative; width: 100%; min-height: 340px; cursor: pointer; transform-style: preserve-3d; transition: transform .25s var(--ease); }
+  .card { position: relative; width: 100%; min-height: clamp(260px, 48vh, 440px); cursor: pointer; transform-style: preserve-3d; transition: transform .25s var(--ease); }
   .card.flipped { transform: rotateY(180deg); }
-  .face { position: absolute; inset: 0; backface-visibility: hidden; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 30px; box-sizing: border-box; text-align: center; }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(8px, 1.6vh, 16px); padding: clamp(20px, 3.5vw, 40px); box-sizing: border-box; text-align: center; overflow-y: auto; overscroll-behavior: contain; }
   .face.back { transform: rotateY(180deg); }
-  .sentence { font-family: var(--font-text); font-size: 26px; line-height: 1.5; text-wrap: pretty; }
-  .gap { display: inline-block; min-width: 72px; border-bottom: 2px solid var(--accent); }
+  .headword { font-family: var(--font-display); font-size: clamp(30px, 1.6rem + 2vw, 46px); font-weight: 700; line-height: 1.15; text-wrap: balance; }
+  .sentence { font-family: var(--font-text); font-size: clamp(16px, .95rem + .5vw, 21px); line-height: 1.45; text-wrap: pretty; max-width: 40ch; }
   .sentence mark { background: var(--accent-soft); color: var(--accent-strong); border-radius: 6px; padding: 0 6px; font-weight: 700; }
-  .hint { font-size: 16px; font-weight: 600; color: var(--ink-soft); }
+  .meaning { font-family: var(--font-display); font-size: clamp(20px, 1.1rem + 1vw, 30px); font-weight: 700; color: var(--accent-strong); }
   .wordrow { display: flex; align-items: baseline; justify-content: center; gap: 9px; flex-wrap: wrap; }
-  .wordrow b { font-family: var(--font-display); font-size: 20px; }
-  .wordrow .ipa { font-size: 14px; color: var(--ink-faint); }
+  .wordrow .sound { font-size: clamp(15px, .9rem + .2vw, 18px); font-weight: 700; color: var(--accent-strong); }
+  .wordrow .ipa { font-size: clamp(15px, .9rem + .2vw, 18px); color: var(--ink-faint); }
   .wordrow .pos { font-size: 13px; font-style: italic; color: var(--ink-faint); }
-  .def { font-size: 15px; line-height: 1.45; color: var(--ink-soft); max-width: 440px; }
-  .trans { font-size: 14px; font-style: italic; color: var(--ink-faint); }
-  .speak { background: var(--surface-2); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .wordrow span:empty { display: none; }
+  .cardimg { max-width: min(100%, 340px); max-height: 26vh; border-radius: var(--radius-sm); object-fit: cover; box-shadow: var(--shadow-1); }
+  .def { font-size: clamp(14px, .85rem + .2vw, 16px); line-height: 1.45; color: var(--ink-soft); max-width: 52ch; }
+  .senses { font-size: clamp(12px, .8rem + .1vw, 14px); line-height: 1.55; color: var(--ink-faint); max-width: 60ch; border-top: 1px solid var(--line); padding-top: clamp(8px, 1.4vh, 12px); }
+  .senses:empty { display: none; }
+  .trans { font-size: clamp(13px, .8rem + .2vw, 15px); font-style: italic; color: var(--ink-faint); max-width: 52ch; }
+  .speak { background: var(--surface-2); border: none; border-radius: 50%; width: 44px; height: 44px; flex: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .speak:hover { filter: brightness(.96); }
   .tip { font-size: 12px; font-weight: 600; color: var(--ink-faint); }
-  .grades { display: none; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; margin-top: 22px; animation: tut-rise .2s var(--ease); }
+  .grades { display: none; grid-template-columns: repeat(4, 1fr); gap: clamp(6px, 1.2vw, 12px); width: 100%; margin-top: clamp(12px, 2.5vh, 24px); animation: tut-rise .2s var(--ease); }
   .grades.show { display: grid; }
   .grades button { border: none; cursor: pointer; border-radius: var(--radius-sm); padding: 12px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 44px; font-weight: 700; font-size: 15px; }
   .grades button:hover { filter: brightness(.97); }
@@ -46,13 +50,23 @@
   .keys { text-align: center; font-size: 11px; font-weight: 600; color: var(--ink-faint); margin-top: 10px; }
   .end { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-2); padding: 40px 32px; text-align: center; width: 100%; box-sizing: border-box; animation: tut-rise .25s var(--ease); }
   .check { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-soft); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; animation: tut-pop .35s var(--ease); }
-  .end h2 { font-family: var(--font-display); font-size: 26px; margin: 0 0 18px; }
+  .end h2 { font-family: var(--font-display); font-size: 26px; margin: 0 0 8px; }
+  .end-sub { font-size: 15px; color: var(--ink-soft); margin: 0 0 20px; }
+  .end-sub:empty { display: none; }
   .stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 26px; }
   .stats b { display: block; font-family: var(--font-display); font-size: 28px; }
   .stats small { font-size: 12px; font-weight: 600; color: var(--ink-faint); }
   .done-btn { display: inline-block; background: var(--accent); color: var(--on-accent); border: none; font-weight: 700; font-size: 16px; padding: 13px 32px; border-radius: var(--radius-sm); cursor: pointer; }
   .done-btn:hover { filter: brightness(1.06); }
   .hidden { display: none !important; }
+  .meaning:empty, .trans:empty, .def:empty, .sentence:empty { display: none; }
+  @media (pointer: coarse) { .keys { display: none; } }
+  @media (max-height: 640px) { .tip { display: none; } .face { justify-content: flex-start; } }
+  @media (max-width: 420px) {
+    .grades button { font-size: 14px; padding: 10px 4px 8px; }
+    .grades small { font-size: 10px; }
+    header { padding: 10px 14px; }
+  }
 </style>
 </head>
 <body style="min-height:100vh;display:flex;flex-direction:column">
@@ -69,17 +83,18 @@
     <div class="scene">
       <div class="card" id="card" role="button" tabindex="0" aria-label="Flashcard. Press space or tap to flip.">
         <div class="face front">
-          <div class="sentence" id="front-sentence"></div>
-          <div class="hint" id="hint"></div>
-          <button class="speak" id="speak-front" aria-label="Listen to the sentence">🔊</button>
+          <div class="headword" id="word"></div>
+          <div class="wordrow"><span class="sound" id="sound"></span><span class="ipa" id="ipa"></span><span class="pos" id="pos"></span></div>
+          <div class="sentence" id="example"></div>
+          <button class="speak" id="speak-front" aria-label="Listen to the word and example">🔊</button>
           <div class="tip">tap or press space to flip</div>
         </div>
         <div class="face back">
-          <div class="sentence" id="back-sentence"></div>
-          <div class="wordrow"><b id="word"></b><span class="ipa" id="ipa"></span><span class="pos" id="pos"></span></div>
+          <img class="cardimg hidden" id="cardimg" alt="">
+          <div class="meaning" id="meaning"></div>
           <div class="def" id="def"></div>
           <div class="trans" id="trans"></div>
-          <button class="speak" id="speak-back" aria-label="Listen to the full sentence">🔊</button>
+          <div class="senses" id="senses"></div>
         </div>
       </div>
     </div>
@@ -94,9 +109,10 @@
   <div class="end hidden" id="end">
     <div class="check">✓</div>
     <h2 id="end-title">Session complete</h2>
-    <div class="stats">
+    <p class="end-sub" id="end-sub"></p>
+    <div class="stats" id="end-stats">
       <div><b id="end-total">0</b><small>cards</small></div>
-      <div><b id="end-acc">0%</b><small>accuracy</small></div>
+      <div><b id="end-reviews">0</b><small>reviews</small></div>
     </div>
     <button class="done-btn" id="close">Done</button>
   </div>
@@ -104,12 +120,12 @@
 <script>
 (() => {
   const DEMO = [
-    { id: 'd1', front: 'Can I ___ your pen? I forgot mine.', answer: 'borrow', hint: 'pedir prestado', ipa: '/ˈbɒr.əʊ/', pos: 'verb', definition: 'to take something that you will give back later', translation: '¿Me prestas tu bolígrafo? Olvidé el mío.' },
-    { id: 'd2', front: "She usually ___ up at seven o'clock.", answer: 'wakes', word: 'wake up', hint: 'despertarse', ipa: '/weɪk/', pos: 'phrasal verb', definition: 'to stop sleeping', translation: 'Ella normalmente se despierta a las siete.' },
-    { id: 'd3', front: "There isn't ___ milk in the fridge.", answer: 'any', hint: 'nada de', ipa: '/ˈen.i/', pos: 'determiner', definition: 'used in negatives: not even a small amount', translation: 'No queda nada de leche en la nevera.' },
-    { id: 'd4', front: 'How much does this book ___?', answer: 'cost', hint: 'costar', ipa: '/kɒst/', pos: 'verb', definition: 'to have a particular price', translation: '¿Cuánto cuesta este libro?' },
+    { id: 'd1', front: 'Can I ___ your pen? I forgot mine.', answer: 'borrow', sound: 'bó·rrou', hint: 'pedir prestado', ipa: '/ˈbɒr.əʊ/', pos: 'verb', definition: 'to take something that you will give back later', translation: '¿Me prestas tu bolígrafo? Olvidé el mío.' },
+    { id: 'd2', front: "She usually ___ up at seven o'clock.", answer: 'wakes', word: 'wake up', sound: 'wéik ap', hint: 'despertarse', ipa: '/weɪk ʌp/', pos: 'phrasal verb', definition: 'to stop sleeping', translation: 'Ella normalmente se despierta a las siete.' },
+    { id: 'd3', front: "There isn't ___ milk in the fridge.", answer: 'any', sound: 'é·ni', hint: 'nada de', ipa: '/ˈen.i/', pos: 'determiner', definition: 'used in negatives: not even a small amount', translation: 'No queda nada de leche en la nevera.' },
+    { id: 'd4', front: 'How much does this book ___?', answer: 'cost', sound: 'kost', hint: 'costar', ipa: '/kɒst/', pos: 'verb', definition: 'to have a particular price', translation: '¿Cuánto cuesta este libro?' },
   ];
-  let deck = [], i = 0, flipped = false, results = [], live = false;
+  let deck = [], i = 0, total = 0, retired = 0, flipped = false, results = [], live = false;
 
   const $ = id => document.getElementById(id);
   const card = $('card'), grades = $('grades');
@@ -128,22 +144,29 @@
     }
     try {
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'en-GB'; u.rate = 0.95;
+      u.lang = 'en-US'; u.rate = 0.95;
       speechSynthesis.cancel(); speechSynthesis.speak(u);
     } catch (e) {}
   }
 
   function render() {
-    $('reviewed').textContent = i; $('total').textContent = deck.length;
-    $('bar').style.width = (deck.length ? i / deck.length * 100 : 0) + '%';
-    if (i >= deck.length) return finish();
-    const c = deck[i], parts = c.front.split('___');
-    $('front-sentence').innerHTML = esc(parts[0]) + '<span class="gap">&nbsp;</span>' + esc(parts[1] ?? '');
-    $('hint').textContent = c.hint ? '(' + c.hint + ')' : '';
-    $('back-sentence').innerHTML = esc(parts[0]) + '<mark>' + esc(c.answer) + '</mark>' + esc(parts[1] ?? '');
+    $('reviewed').textContent = retired; $('total').textContent = total;
+    $('bar').style.width = (total ? retired / total * 100 : 0) + '%';
+    if (retired >= total) return finish();
+    const c = deck[i], parts = (c.front || '').split('___');
     $('word').textContent = c.word || c.answer;
+    $('sound').textContent = c.sound || '';
     $('ipa').textContent = c.ipa || ''; $('pos').textContent = c.pos || '';
-    $('def').textContent = c.definition || ''; $('trans').textContent = c.translation || '';
+    $('example').innerHTML = parts.length > 1
+      ? esc(parts[0]) + '<mark>' + esc(c.answer) + '</mark>' + esc(parts[1] ?? '')
+      : esc(c.front || '');
+    $('meaning').textContent = c.hint || '';
+    $('def').textContent = c.definition || '';
+    $('trans').textContent = c.translation || '';
+    $('senses').textContent = c.senses || '';
+    const img = $('cardimg');
+    if (c.image) { img.src = '/api/img/' + encodeURIComponent(c.image); img.classList.remove('hidden'); }
+    else { img.classList.add('hidden'); img.removeAttribute('src'); }
     flipped = false; card.classList.remove('flipped'); grades.classList.remove('show');
   }
 
@@ -157,17 +180,26 @@
   }
 
   function grade(g) {
-    if (!flipped || i >= deck.length) return;
+    if (!flipped || retired >= total) return;
     results.push({ id: deck[i].id, grade: g });
+    // "Again" means <10m: the card comes back later in this same session, until it sticks.
+    // A card only "retires" (leaves the queue and counts toward progress) on a grade > Again.
+    // ponytail: requeued at the end, no cap on repeats — add one if a session ever loops forever.
+    if (g === 1) deck.push(deck[i]); else retired++;
     i++; render();
   }
 
   async function finish() {
     $('session').classList.add('hidden'); $('end').classList.remove('hidden');
-    $('end-total').textContent = results.length;
-    const good = results.filter(r => r.grade >= 3).length;
-    $('end-acc').textContent = (results.length ? Math.round(good / results.length * 100) : 0) + '%';
-    if (!results.length) $('end-title').textContent = 'No cards due — nice!';
+    if (!total) {
+      // Re-entered with nothing due: today's review is already saved and done.
+      $('end-title').textContent = 'All done for today ✓';
+      $('end-sub').textContent = "Today's cards are already reviewed and saved. Come back tomorrow.";
+      $('end-stats').classList.add('hidden');
+    } else {
+      $('end-total').textContent = total;
+      $('end-reviews').textContent = results.length;
+    }
     if (live && results.length) {
       try {
         await fetch('/api/deck', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ results }) });
@@ -177,9 +209,17 @@
 
   card.addEventListener('click', flip);
   grades.addEventListener('click', e => { const b = e.target.closest('button'); if (b) grade(+b.dataset.g); });
-  $('speak-front').addEventListener('click', e => { e.stopPropagation(); speak(deck[i].front.replace('___', '…')); });
-  $('speak-back').addEventListener('click', e => { e.stopPropagation(); speak(deck[i].front.replace('___', deck[i].answer)); });
-  $('close').addEventListener('click', () => { window.close(); });
+  $('speak-front').addEventListener('click', e => {
+    e.stopPropagation();
+    const c = deck[i], s = (c.front || '').replace('___', c.answer);
+    speak((c.word || c.answer) + (s ? '. ' + s : ''));
+  });
+  $('cardimg').addEventListener('error', () => $('cardimg').classList.add('hidden'));
+  $('close').addEventListener('click', () => {
+    window.close();
+    // Browsers block window.close() on user-opened tabs — tell them instead of failing silently.
+    setTimeout(() => { $('close').textContent = 'Saved — you can close this tab'; $('close').disabled = true; }, 100);
+  });
   window.addEventListener('keydown', e => {
     if (e.code === 'Space') { e.preventDefault(); flip(); }
     const n = parseInt(e.key, 10);
@@ -189,8 +229,9 @@
   fetch('/api/deck').then(r => r.ok ? r.json() : null).then(d => {
     if (d && Array.isArray(d.cards)) { deck = d.cards; live = true; }
     else deck = DEMO;
+    total = deck.length;
     render();
-  }).catch(() => { deck = DEMO; render(); });
+  }).catch(() => { deck = DEMO; total = deck.length; render(); });
 
   fetch('/api/progress').then(r => r.ok ? r.json() : null)
     .then(p => { if (p) $('streak').textContent = p.streak; }).catch(() => {});

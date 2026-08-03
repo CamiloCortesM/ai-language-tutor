@@ -18,4 +18,4 @@ Feedback protocol (`docs/methodology.md` §4 — focused):
 
 ## Write-backs
 
-Error types → `errors.md`; each corrected sentence they got wrong → cloze card from their own text. Rubric scores into the session log — the trend across weeks feeds the level-up decision. Log the step.
+Error types → `errors.md`; each corrected sentence they got wrong → a card whose example comes from their own text. Rubric scores into the session log — the trend across weeks feeds the level-up decision. Log the step.
