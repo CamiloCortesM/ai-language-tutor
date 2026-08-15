@@ -15,11 +15,11 @@ Exam conditions: no hints, no corrections mid-paper, time limits stated per part
 1. **Reading (+ Use of English from B2)** — texts follow the known-words rule *for the level*, not for the learner (this is a test, not input).
 2. **Writing** — level task from `writing.md` table, scored with the CEFR rubric under exam strictness.
 3. **Listening** — spoken texts, questions after one play (two at A1–A2).
-4. **Speaking** — interview + picture/topic long turn + (B1+) discussion. Voice-required: `text_first` learners must do this paper by voice or the exam cannot gate the level — offer to schedule it separately rather than skip it.
+4. **Speaking** — interview + picture/topic long turn + (B1+) discussion. Before handoff, write every prompt as a finite numbered plan in `portable/voice-tutor.md`, with observable completion for each and `closing: none`. Use the saved voice route. If it is unavailable, schedule this paper separately; the exam cannot gate the level and no typed substitute counts.
 
 ## Scoring & verdict
 
 Per-paper % and overall (papers weighted equally). **Gate: ≥70% overall AND ≥60% on every paper** (`docs/methodology.md` §9).
 
-- **Pass:** update `level` in profile + progress.json, reset `unit: 1`, celebrate with specifics, preview the new level.
+- **Pass:** update `level` in `student/<active>/progress.json`, reset `unit: 1`, celebrate with specifics, preview the new level.
 - **Fail:** no drama — produce the error profile (which units/structures failed), build a targeted review plan (those units back into rotation), retake in ≥1 week. Log everything to `errors.md` and the session history.

@@ -30,7 +30,7 @@ Passing the C1 exam simulation triggers three things:
 ## Progression rules
 
 - A unit is "done" when its material was used across the strands (not just read) and its checkpoint quiz scores ≥70%.
-- Level-up requires all 12 units + the exam simulation ≥70% **including the spoken paper** (`docs/methodology.md` §9).
+- Level-up requires all 12 units + **≥70% overall and ≥60% on every exam paper, including speaking** (`docs/methodology.md` §9).
 - The error log can pause progression: 3+ recurrences of a past unit's structure send it back into rotation before new material.
 
 <!-- ponytail: vocab/ frequency lists (Oxford 3000/5000 split by level) not shipped yet;

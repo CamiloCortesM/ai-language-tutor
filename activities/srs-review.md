@@ -9,16 +9,16 @@ Serve + open `flashcards.html` and wait on the event file per AGENTS.md §HTML a
 ## Chat protocol (no browser)
 
 1. `python3 tools/srs.py due` → take up to ~12 cards (oldest due first).
-2. Per card, show the word side only:
+2. Per card, show the contextual cloze only:
 
-   > **borrow** · *bó·rrou* · /ˈbɒr.əʊ/ · verb
-   > *Can I **borrow** your pen? I forgot mine.*
+   > *Can I ___ your pen? I forgot mine.*
+   > pista: *pedir prestado*
 
-3. Learner says what it means (L1 is fine) — better yet, meaning + a quick sentence of their own.
-4. Reveal the other side: meaning in their L1, simple definition, translation of the example, other senses if the card has them.
-5. Ask for an honest self-grade — **1 Again · 2 Hard · 3 Good · 4 Easy** — with next-interval hints. Instant and sure = Good/Easy; slow or fuzzy = Hard; wrong or blank = Again. Knowing a *different* sense than the card's is a miss for *this* card ("as = 'mientras' is real, but this card is as = 'como (rol)' — grade on that").
+3. Learner supplies the missing word/chunk (`borrow`). Do not accept a synonym when this card trains a specific form or collocation.
+4. Reveal: **borrow** · *bó·rrou* · /ˈbɒr.əʊ/ · verb; the completed sentence with **borrow** marked; simple definition; full L1 translation; other senses if present.
+5. Ask for an honest self-grade — **1 Again · 2 Hard · 3 Good · 4 Easy** — with next-interval hints. Exact and immediate = Good/Easy; correct but slow or inflected wrongly = Hard; wrong/blank = Again. A different valid sense is still a miss for this card's sentence.
 6. `python3 tools/srs.py grade <id> <n>` after each.
-7. On request: TTS the word before the reveal (ear-check the pronunciation) or the example sentence after it.
+7. On request, TTS the completed sentence after reveal. Never play the answer before retrieval.
 
 ## After the run
 

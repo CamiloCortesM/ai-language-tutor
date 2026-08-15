@@ -1,6 +1,6 @@
 # Activity: Pronunciation
 
-**Mode:** voice-required (perception drills work with TTS alone; production needs the learner's voice or the aloud-fallback) · **Duration:** 5–10 min
+**Mode:** voice-required for production (perception drills use fixed TTS) · **Duration:** 5–10 min
 
 ## Pick the target sound
 
@@ -15,10 +15,11 @@ Train the ear before the mouth (`docs/methodology.md` §6):
 
 ## 2. Production second
 
+- Use the saved `voice_channel` and `portable/voice-tutor.md`. Build a finite **production-only** plan before starting: exactly 3 word/pair repetitions, 2 short-sentence repetitions and, at B1+, 3 numbered passes of one shadowing chunk; every good-faith attempt completes its step. Set `closing: none` because feedback happens per trial. If voice is unavailable, keep any perception score but defer production and log `"speaking_debt": true`; never substitute typing.
 - **Repeat-after-me** on the same pairs, then on short sentences packing the target sound ("Please sit in that seat").
 - **Shadowing** (B1+): speak a 2–3 sentence chunk, learner repeats near-simultaneously imitating rhythm and intonation, 3 passes. With whisper/STT available, compare their transcription against the target and point at gross mismatches only — no phoneme-level scoring without a real scoring API.
 - Word stress & schwa (huge for most L1s): mark the stressed syllable in this week's new vocab, exaggerate-then-normalize.
 
 ## Write-backs
 
-Perception scores per pair → session log (the queue lives on trends). Persistently confused pairs → note in `errors.md`. Log the step (with fallback flag if production was text-only).
+Perception scores per pair → session log (the queue lives on trends). Persistently confused pairs → note in `student/<active>/errors.md`. Log whether production completed; otherwise log `speaking_debt`.

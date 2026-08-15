@@ -22,7 +22,9 @@
   .face.back { transform: rotateY(180deg); }
   .headword { font-family: var(--font-display); font-size: clamp(30px, 1.6rem + 2vw, 46px); font-weight: 700; line-height: 1.15; text-wrap: balance; }
   .sentence { font-family: var(--font-text); font-size: clamp(16px, .95rem + .5vw, 21px); line-height: 1.45; text-wrap: pretty; max-width: 40ch; }
+  .cloze { font-family: var(--font-display); font-size: clamp(24px, 1.25rem + 1.5vw, 36px); font-weight: 650; }
   .sentence mark { background: var(--accent-soft); color: var(--accent-strong); border-radius: 6px; padding: 0 6px; font-weight: 700; }
+  .cue { color: var(--accent-strong); background: var(--accent-soft); border-radius: 999px; padding: 7px 13px; font-size: 14px; font-weight: 700; }
   .meaning { font-family: var(--font-display); font-size: clamp(20px, 1.1rem + 1vw, 30px); font-weight: 700; color: var(--accent-strong); }
   .wordrow { display: flex; align-items: baseline; justify-content: center; gap: 9px; flex-wrap: wrap; }
   .wordrow .sound { font-size: clamp(15px, .9rem + .2vw, 18px); font-weight: 700; color: var(--accent-strong); }
@@ -59,7 +61,7 @@
   .done-btn { display: inline-block; background: var(--accent); color: var(--on-accent); border: none; font-weight: 700; font-size: 16px; padding: 13px 32px; border-radius: var(--radius-sm); cursor: pointer; }
   .done-btn:hover { filter: brightness(1.06); }
   .hidden { display: none !important; }
-  .meaning:empty, .trans:empty, .def:empty, .sentence:empty { display: none; }
+  .meaning:empty, .trans:empty, .def:empty, .sentence:empty, .cue:empty { display: none; }
   @media (pointer: coarse) { .keys { display: none; } }
   @media (max-height: 640px) { .tip { display: none; } .face { justify-content: flex-start; } }
   @media (max-width: 420px) {
@@ -82,14 +84,16 @@
   <div id="session">
     <div class="scene">
       <div class="card" id="card" role="button" tabindex="0" aria-label="Flashcard. Press space or tap to flip.">
-        <div class="face front">
+        <div class="face front" aria-hidden="false">
+          <div class="sentence cloze" id="prompt"></div>
+          <div class="cue" id="cue"></div>
+          <div class="tip">retrieve the missing word or phrase, then flip</div>
+        </div>
+        <div class="face back" aria-hidden="true" inert>
           <div class="headword" id="word"></div>
           <div class="wordrow"><span class="sound" id="sound"></span><span class="ipa" id="ipa"></span><span class="pos" id="pos"></span></div>
           <div class="sentence" id="example"></div>
-          <button class="speak" id="speak-front" aria-label="Listen to the word and example">🔊</button>
-          <div class="tip">tap or press space to flip</div>
-        </div>
-        <div class="face back">
+          <button class="speak" id="speak-back" aria-label="Listen to the completed sentence" tabindex="-1">🔊</button>
           <img class="cardimg hidden" id="cardimg" alt="">
           <div class="meaning" id="meaning"></div>
           <div class="def" id="def"></div>
@@ -129,6 +133,7 @@
 
   const $ = id => document.getElementById(id);
   const card = $('card'), grades = $('grades');
+  const frontFace = card.querySelector('.front'), backFace = card.querySelector('.back');
 
   let premiumTTS = true;
   async function speak(text) {
@@ -154,6 +159,10 @@
     $('bar').style.width = (total ? retired / total * 100 : 0) + '%';
     if (retired >= total) return finish();
     const c = deck[i], parts = (c.front || '').split('___');
+    $('prompt').innerHTML = parts.length > 1
+      ? esc(parts[0]) + '<mark aria-label="missing word">_____</mark>' + esc(parts[1] ?? '')
+      : esc(c.front || 'Missing sentence context');
+    $('cue').textContent = c.hint || '';
     $('word').textContent = c.word || c.answer;
     $('sound').textContent = c.sound || '';
     $('ipa').textContent = c.ipa || ''; $('pos').textContent = c.pos || '';
@@ -168,6 +177,9 @@
     if (c.image) { img.src = '/api/img/' + encodeURIComponent(c.image); img.classList.remove('hidden'); }
     else { img.classList.add('hidden'); img.removeAttribute('src'); }
     flipped = false; card.classList.remove('flipped'); grades.classList.remove('show');
+    frontFace.inert = false; backFace.inert = true;
+    frontFace.setAttribute('aria-hidden', 'false'); backFace.setAttribute('aria-hidden', 'true');
+    $('speak-back').tabIndex = -1;
   }
 
   function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
@@ -177,6 +189,10 @@
     flipped = !flipped;
     card.classList.toggle('flipped', flipped);
     grades.classList.toggle('show', flipped);
+    frontFace.inert = flipped; backFace.inert = !flipped;
+    frontFace.setAttribute('aria-hidden', String(flipped));
+    backFace.setAttribute('aria-hidden', String(!flipped));
+    $('speak-back').tabIndex = flipped ? 0 : -1;
   }
 
   function grade(g) {
@@ -209,10 +225,10 @@
 
   card.addEventListener('click', flip);
   grades.addEventListener('click', e => { const b = e.target.closest('button'); if (b) grade(+b.dataset.g); });
-  $('speak-front').addEventListener('click', e => {
+  $('speak-back').addEventListener('click', e => {
     e.stopPropagation();
     const c = deck[i], s = (c.front || '').replace('___', c.answer);
-    speak((c.word || c.answer) + (s ? '. ' + s : ''));
+    speak(s);
   });
   $('cardimg').addEventListener('error', () => $('cardimg').classList.add('hidden'));
   $('close').addEventListener('click', () => {
@@ -221,9 +237,12 @@
     setTimeout(() => { $('close').textContent = 'Saved — you can close this tab'; $('close').disabled = true; }, 100);
   });
   window.addEventListener('keydown', e => {
-    if (e.code === 'Space') { e.preventDefault(); flip(); }
+    const inControl = e.target.closest?.('button, input, textarea, select, a');
+    if (!inControl && (e.code === 'Space' || (e.key === 'Enter' && e.target === card))) {
+      e.preventDefault(); flip();
+    }
     const n = parseInt(e.key, 10);
-    if (n >= 1 && n <= 4) grade(n);
+    if (!inControl && n >= 1 && n <= 4) grade(n);
   });
 
   fetch('/api/deck').then(r => r.ok ? r.json() : null).then(d => {

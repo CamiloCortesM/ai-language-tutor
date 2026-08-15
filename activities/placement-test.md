@@ -1,6 +1,6 @@
 # Activity: Placement test
 
-**Mode:** chat (+ a short voice probe if available) · **When:** first run only · **Duration:** ~15–20 min
+**Mode:** chat + one `voice-required` speaking probe · **When:** first run only · **Duration:** ~15–20 min
 
 Determines the learner's CEFR level and creates their profile. Be warm and brief — this is their first impression.
 
@@ -8,7 +8,7 @@ Determines the learner's CEFR level and creates their profile. Be warm and brief
 
 **Very first message, before anything else: ask their native language.** They may not read English yet, so ask in two lines — English plus your best guess from how they greeted you (their wording, script, locale): *"What's your native language? / ¿Cuál es tu idioma nativo?"*. Just the question — no greeting speech, no explanation of how languages will be used later; that belongs in §5. From their answer on, run the setup and the test in that language.
 
-Then ask, conversationally, not as a form: name; **which language they want to learn** (default English; no curriculum folder for it yet → AGENTS.md language policy: offer to generate one); why they're learning (goals); topics they enjoy (interests); realistic minutes per day; voice preference. Ask whether they want `always_on`, `when_required`, or `text_first`; explain that speaking practice works much better aloud and that text activities stay in text. Also ask where they can use voice: in the current agent/workspace, OpenAI Work/Codex voice, an external voice AI such as Claude or regular ChatGPT, or nowhere. Save the matching `voice_channel`; never assume Work/Codex voice is available.
+Then ask, conversationally, not as a form: name; **which language they want to learn** (default English; no curriculum folder for it yet → AGENTS.md language policy: offer to generate one); why they're learning (goals); topics they enjoy (interests); and realistic minutes per day. Do not ask whether lessons should be text or voice: activities decide that. Ask only where required speaking activities can run — current workspace, OpenAI Work/Codex voice, an external voice AI such as Claude or ChatGPT, or nowhere — and save the matching `voice_channel`. Never assume Work/Codex voice is available.
 
 ## 2. Adaptive assessment
 
@@ -23,16 +23,17 @@ Rules: clearly comfortable → move up a level; struggling → move down; stop w
 
 ## 3. Speaking probe (if voice available)
 
-1 minute: introduce yourself / describe your city. Use the current agent's voice when active; otherwise ask the learner to turn it on if their preference allows it, then offer the optional bridge or the aloud fallback. Note pronunciation issues and fluency — this refines the level and seeds `placement_notes`, it rarely changes the level by itself.
+1 minute: introduce yourself / describe your city. Use the saved `voice_channel`, the `weekly-speaking` type and a finite one-step plan with `closing: none` from `portable/voice-tutor.md`. If the channel is `none` or unavailable, skip the probe and record “speaking not assessed” in `placement_notes`; do not replace it with typing. Note pronunciation issues and fluency — this refines the level and seeds `placement_notes`, but rarely changes the level by itself.
 
 ## 4. Write everything
 
-1. Copy `student.example/` → `student/` if not done.
-2. Fill `student/profile.md` completely (including `placement_notes`: 2–3 lines of observed strengths/gaps).
-3. Set `level` and `unit: 1` in `student/progress.json`.
-4. Seed `student/known_words.txt`: generate ~150–400 highest-frequency words of the target language that this learner demonstrably handles at their level (be conservative — reading sessions will grow the list fast).
-5. Seed 10–15 cards (`python3 tools/srs.py add`) from: words/structures they missed in the test + their interests. Card format per `docs/methodology.md`.
-6. Log the errors observed → `student/errors.md`.
+1. Copy `student.example/` → `student/` if not done. If needed, copy the file set in `student.example/english/` to a new `student/<target>/`.
+2. Write the target-language slug to `student/active.txt` **before any `tools/srs.py` call**.
+3. Fill `student/profile.md` completely (including `placement_notes`: 2–3 lines of observed strengths/gaps).
+4. Set `level` and `unit: 1` in `student/<target>/progress.json`.
+5. Seed `student/<target>/known_words.txt`: generate ~150–400 highest-frequency words of the target language that this learner demonstrably handles at their level (be conservative — reading sessions will grow the list fast).
+6. Seed 10–15 contextual cloze cards (`python3 tools/srs.py add`) from words/structures they missed in the test + their interests. Card format per `docs/methodology.md`.
+7. Log the errors observed → `student/<target>/errors.md`.
 
 ## 5. Present the result
 

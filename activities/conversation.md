@@ -1,59 +1,31 @@
 # Activity: Conversation (roleplay / free talk)
 
-**Mode:** voice-preferred at A1–A2, **voice-required from B1** · **Duration:** 10–15 min
+**Mode:** voice-required at every level · **Duration:** 10–15 min
 
-The closest thing to a tutor session. You stay in character and in the target language; corrections come at the end, not mid-flow.
+The closest thing to a tutor session. The voice tutor stays in character and the learner actually speaks; this activity is never converted to text.
 
-## Setup
+## Setup and handoff
 
-- Scenario from the current unit's topic, the learner's interests, or their choice. Rotate types: transactional roleplay (hotel check-in, job interview, returning a purchase), opinion talk, picture/story description, free chat.
-- Announce scenario + your role + their goal in one line, then follow the voice-channel priority in `AGENTS.md`. For `codex_work`, put the complete conversation details, absolute project root and exact Memory write-backs into the **CODEX/WORK VOICE ACTIVITY** prompt. Define 6–8 numbered roleplay questions followed by exactly one correction attempt. The voice task must use three states: numbered ROLEPLAY steps, CORRECTION, then FINISHED. During ROLEPLAY every response ends with the next required question—never a courtesy-only dead end. The answer to the final question triggers CORRECTION; the very next learner utterance triggers FINISHED regardless of what they say. FINISHED gives the `VOICE RESULT`, tells the learner they may end the call, and the post-call transcript handoff immediately updates and verifies the project files. Never restart, ask “anything else?”, wait for `done`, or offer another scenario. Only for `external`, populate and send this Lesson Pass:
+- Choose a scenario from the current unit, the learner's interests or their request. Rotate transactional roleplay, opinion talk, picture/story description and free conversation.
+- Write **6–8 exact, numbered learner-facing questions** that form one coherent scene. Each question is used once. The answer to the last one is the objective end; duration is only a pacing target.
+- Set `closing: one_self_correction_if_available`, then use the saved `voice_channel` and the canonical controller in `portable/voice-tutor.md`: run it here for `same_workspace`, populate **CODEX/WORK VOICE ACTIVITY** for `codex_work`, or populate the canonical **LESSON PASS JSON** for `external`.
+- Give the model-confusion and hang-up warning from `AGENTS.md` before starting on every route. If the channel is `none` or unavailable, defer the activity and log `"speaking_debt": true`; do not run a typed roleplay.
+- For `codex_work`, include absolute paths and exact Memory write-backs. For `external`, ingest the returned `LESSON REPORT`: `corrections` + contextual `words_struggled` entries → errors and cards; `pronunciation` → perception/production error lines and the next pronunciation target queue; `did_well`/`performance` → session notes; `level_impression: below/above` twice running → flag for review/acceleration. A report with `completed: false` is logged as partial, never as a completed activity.
 
-     ```
-     === LESSON PASS JSON ===
-     {
-       "student": "<name>",
-       "native_language": "<L1>",
-       "target_language": "<language>",
-       "level": "<CEFR>",
-       "lesson_type": "<conversation | fluency-432 | pronunciation | exam-speaking | listening>",
-       "scenario": "<one line>",
-       "target_grammar": ["<from current unit>"],
-       "target_vocabulary": ["<from current unit>"],
-       "recurring_errors": ["<top 3 from errors.md>"],
-       "pronunciation_focus": ["<top 1–2 sound targets, or none yet>"],
-       "correction_style": "quick recast in the moment (max 1 per learner turn), full corrections at the end",
-       "duration_minutes": <number>
-     }
-     === END PASS ===
-     ```
+## Language calibration
 
-     For `codex_work`, the voice task performs these write-backs itself. For `external`, ingest the `LESSON REPORT`: `corrections` + `words_struggled` → `errors.md` and cards; `pronunciation` → `errors.md` as `percepción/producción` lines and the next pronunciation step's target queue (methodology §6 — perception before production); `did_well`/`performance` → session notes; `level_impression: below/above` twice in a row → flag for review/acceleration. Log the step with `"external_voice": true`. The step counts as REAL speaking (no debt).
-  `text_first` fallback — aloud-3×-then-type, logged.
-
-## Language calibration (hard rules)
-
-| Level | Your speech |
+| Level | Voice tutor's speech |
 |---|---|
 | A1 | short sentences, present tense core, high-frequency words, repeat/rephrase freely |
-| A2 | simple past & future, still concrete, light idiom |
+| A2 | simple past and future, still concrete, light idiom |
 | B1 | natural but tidy; introduce unit structures on purpose |
 | B2 | native-adjacent, push abstract turns, disagree sometimes |
 | C1 | full native register, idiom, humor, register shifts |
 
-Weave the unit's grammar/vocab into YOUR turns naturally — input before output. Keep your turns shorter than theirs: ask, don't lecture. If they're drowning, simplify silently; never say "let me make this easier".
+Weave the unit's grammar and vocabulary into the tutor's turns naturally — input before output. Keep tutor turns shorter than learner turns. Simplify silently if the learner is drowning.
 
-## During
-
-- **Real-time micro-corrections (chat):** reply in character; if their turn had an error worth fixing, append ONE footnote line, visually apart from the roleplay — `✏️ *I have 20 years* → *I'm 20 years old*`. Max one per turn, the most damaging error; the rest wait for the end block. No explanations in the footnote — the story never stops for grammar.
-- Interrupt the flow itself **only** when communication actually breaks (then: prompt, don't correct — "Sorry, you took the bus or you take the bus every day?").
-- Note everything else silently as it happens.
-- 8–12 exchanges or the natural end of the scenario, whichever comes first.
-
-## CORRECTIONS block (end of activity)
-
-Max 3 items, most damaging first, per `docs/methodology.md` §4 — prompt self-correction on ONE before revealing. Also name **one thing they did well** with the same specificity.
+During the numbered plan, note errors without interrupting. Interrupt only when communication breaks, using a prompt rather than a correction. The shared controller prevents courtesy-only dead ends, repeated questions and extra rounds.
 
 ## Write-backs
 
-Errors → `errors.md` (increment repeats). Each corrected error → a card whose example sentence is *their own intended sentence* (word = the corrected chunk). Words they reached for and lacked → cards. Log the step (with `fallback` flag if voice was required but not used).
+Errors → `student/<active>/errors.md` (increment repeats). Each corrected error → a contextual cloze card based on the learner's intended sentence; words they reached for and lacked → contextual cards. Log completed or partial status and any `speaking_debt`.

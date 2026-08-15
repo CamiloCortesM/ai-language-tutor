@@ -6,7 +6,7 @@
 
 Turn any AI coding agent into a personal language tutor with memory — a full CEFR course from A1 to C1 that lives in a folder.
 
-No accounts, no subscriptions, no servers. The **agent is the tutor** (it teaches, corrects, converses and examines you), **plain files are the memory** (your level, errors, vocabulary and streak persist between sessions), and **one small script is the clock** (FSRS, the modern spaced-repetition algorithm). Everything is built on evidence-based language pedagogy — see [`docs/methodology.md`](docs/methodology.md).
+Beyond your AI coding agent, the core needs no additional account, subscription or remote server. The **agent is the tutor** (it teaches, corrects, converses and examines you), **plain files are the memory** (your level, errors, vocabulary and streak persist between sessions), and **one small script is the clock** (FSRS, the modern spaced-repetition algorithm). Everything is built on evidence-based language pedagogy — see [`docs/methodology.md`](docs/methodology.md).
 
 Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anything that reads `AGENTS.md`. macOS, Windows and Linux.
 
@@ -15,12 +15,12 @@ Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anyt
 - **Placement test** — a friendly ~15-minute adaptive chat that finds your real CEFR level and builds your profile. No preparation needed.
 - **Daily sessions** — one word (`session`) plans your day: spaced review, comprehensible reading, conversation, writing, pronunciation… balanced across the week and fitted to the minutes you have.
 - **Real curriculum** — 60 CEFR units for English (A1→C1): criterial grammar, vocabulary, functions and Cambridge-style level exams.
-- **Spaced repetition** — word-first flashcards: the word, how it sounds and a real example on the front; the meaning in your language (plus a picture when it helps) on the back. Scheduled with FSRS, generated from *your* errors and readings.
-- **Speaking that counts** — conversation, fluency drills and spoken exams use the current agent's integrated voice when available. An optional Lesson Pass bridge supports another voice AI when needed.
-- **Browser apps** — flashcards, quizzes, assisted reader with read-along audio and a progress dashboard. Self-contained HTML, served locally.
-- **Natural voices, free** — neural TTS via edge-tts, no key or account. Paid voices (OpenAI, ElevenLabs) optional, never required.
+- **Spaced repetition** — sentence-first cloze cards: retrieve a word or chunk inside a real sentence, then reveal its pronunciation, completed context, meaning and optional picture. Scheduled with FSRS and generated from *your* errors and readings.
+- **Speaking that counts** — normal lessons stay in text; conversation, fluency, pronunciation and spoken exams automatically use the voice route saved during setup. One finite controller supports the current workspace, Codex/Work and external voice projects.
+- **Browser apps** — flashcards, quizzes, assisted reader, replayable dictation and a progress dashboard. Self-contained HTML, served locally.
+- **Natural voices, free** — neural TTS via the cloud-based edge-tts service, no key or account. Browser/OS voices work locally; OpenAI and ElevenLabs are optional.
 - **Any native language, any target** — the tutor explains in *your* language; English ships complete, and other target languages are generated in place on request.
-- **Private by design** — everything runs and stays on your machine.
+- **Local memory** — the deck and progress stay in local files. Cloud voice/TTS receives only the text or lesson context sent to it; optional Openverse image lookup receives the search phrase.
 
 ## Quick start
 
@@ -36,7 +36,7 @@ From then on, your daily class is one word: **`session`**. In Claude Code, Curso
 
 The tutor reads your memory, greets you with your streak and due cards, and runs a plan shaped to your daily minutes — for example: 10' flashcard review → 15' reading at 95–98% known words → 15' spoken roleplay → 5' grammar targeting your most repeated error. Every activity writes back what it learned about you: new errors become flashcards, mastered words unlock harder texts, and tomorrow's class starts where today's ended.
 
-Speaking steps are enforced, not optional — you cannot pass B1 without a spoken exam. When your agent has integrated voice, turn it on and do the lesson there. If voice is off, the tutor reminds you before a speaking step; if it is unavailable or you prefer another AI, use the optional [voice bridge](portable/voice-tutor.md).
+Speaking steps are enforced, not optional — you cannot pass B1 without a spoken exam. Setup asks once where voice is available and reuses that route automatically. If it is unavailable, the tutor defers the spoken step and tracks the debt; it never pretends typing was speaking. The finite [voice bridge](portable/voice-tutor.md) supports Codex/Work and external voice projects.
 
 ## Languages
 
@@ -49,9 +49,9 @@ Speaking steps are enforced, not optional — you cannot pass B1 without a spoke
 ```
 AGENTS.md            the tutor's brain — identity, rules, memory protocol
 docs/                methodology, architecture, and the research behind them
-activities/          the 12 lesson types the tutor can run (plain markdown)
+activities/          lesson procedures and the daily orchestrator (plain markdown)
 languages/english/   curriculum: 60 CEFR units + notes per native language
-apps/                browser apps: flashcards, quiz, reader, dashboard
+apps/                browser apps: flashcards, quiz, reader, dictation, dashboard
 portable/            optional voice bridge for another voice AI
 tools/               srs.py (FSRS) · serve.py (local API) · tts.py (voices)
 student.example/     template for your data — your real student/ is gitignored
@@ -59,7 +59,7 @@ student.example/     template for your data — your real student/ is gitignored
 
 ## Privacy & API keys
 
-Your data never leaves your machine: profile, errors and progress live in `student/` (gitignored), and the only server is `localhost`. The default stack needs **zero API keys**. If you opt into a paid voice, pass the key only as an environment variable (`export OPENAI_API_KEY=...`) — never write keys into files in this folder and never paste them into the chat: the agent can read both. Keys are sent only to their provider over HTTPS and never written to disk.
+Profile, errors and progress live in `student/` (gitignored), and the app server binds to `localhost`. The text-only stack and browser/OS TTS need **zero API keys and no cloud audio service**. Edge TTS is free but cloud-based: it receives the text to synthesize; OpenAI, ElevenLabs and voice models receive the text or lesson context sent to them. `srs.py img` sends only the visual search phrase to Openverse and downloads the chosen result. The rest of the course memory remains local. Pass API keys only as environment variables (`export OPENAI_API_KEY=...`) — never write them into this folder or paste them into chat.
 
 ## Contributing
 

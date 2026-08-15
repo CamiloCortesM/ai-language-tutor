@@ -1,6 +1,6 @@
 # Activity: Weekly check (progress pulse)
 
-**Mode:** mixed — speaking part voice-preferred · **Duration:** 15–20 min · **Cadence:** every ~7 study days (session.md proposes it)
+**Mode:** mixed — speaking part voice-required · **Duration:** 15–20 min · **Cadence:** every ~7 study days (session.md proposes it)
 
 Not the level gate — that's `exam-simulator.md`. This is a short four-skill pulse whose job is to (a) show the learner what actually improved this week and (b) decide what next week focuses on. It should feel like a highlight reel of the week, not an exam.
 
@@ -11,7 +11,7 @@ Content comes from THIS week's material (units covered, new cards, recent errors
 1. **Listening** — 3–4 TTS sentences (dictation.html, or chat with `tts.py`) + 2 comprehension questions.
 2. **Reading** — one short known-words text + 3 questions (chat or quiz.html).
 3. **Writing** — 3–4 sentences on a prompt that forces the week's structures.
-4. **Speaking** — 1-min mini-talk on a week topic: current agent voice if active; otherwise the optional bridge (Lesson Pass, `lesson type: exam-speaking`, ~4 min), else aloud-3×-then-type, logged as fallback.
+4. **Speaking** — 1-min mini-talk on a week topic through the saved voice route. Populate a finite `weekly-speaking` plan in `portable/voice-tutor.md` with the exact prompt, one observable completion and `closing: none`. If unavailable, leave this part pending and log `"speaking_debt": true`; typing does not complete it.
 
 ## Score & steer
 
@@ -21,4 +21,4 @@ Content comes from THIS week's material (units covered, new cards, recent errors
 
 ## Write-backs
 
-New errors → `errors.md`; misses worth keeping → cards. History entry: `weekly-check: L✓ R± W✓ S✗ → focus: <X>`. Log fallback flags as usual.
+New errors → `student/<active>/errors.md`; misses worth keeping → contextual cards. History entry: `weekly-check: L✓ R± W✓ S✗ → focus: <X>`. Log `speaking_debt` when the speaking part remains pending.

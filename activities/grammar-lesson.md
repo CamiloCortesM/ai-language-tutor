@@ -16,4 +16,4 @@ Priority: (1) any `errors.md` pattern with 3+ counts, (2) the current unit's gra
 
 ## Write-backs
 
-2–3 cards targeting the structure (word = the target chunk, e.g. *have been + -ing*; example = their own practice sentence). If the topic came from `errors.md`, note the lesson date on that line — three lessons on the same pattern without improvement means the approach must change (different angle, more input, easier context). Log the step.
+2–3 contextual cloze cards targeting the structure. `word` names the pattern (e.g. *have been + -ing*), while `answer` is the exact text that replaces `___` in the learner's practice sentence (e.g. *have been* in “I ___ working all morning”). If the topic came from `errors.md`, note the lesson date on that line — three lessons on the same pattern without improvement means the approach must change (different angle, more input, easier context). Log the step.

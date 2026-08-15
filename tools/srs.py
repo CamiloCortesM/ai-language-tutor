@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Spaced-repetition scheduler (FSRS) + streak. Stdlib only.
 
-Data: student/cards.json, student/progress.json.
+Data: student/<active>/cards.json, student/<active>/progress.json.
 Commands:
   due                    print due cards as JSON
   grade <id> <1-4>       apply a review grade (1 Again, 2 Hard, 3 Good, 4 Easy)
@@ -89,6 +89,20 @@ def review(card, grade, today):
     return interval
 
 
+def validate_card(card):
+    if not isinstance(card, dict):
+        raise ValueError("each card must be a JSON object")
+    front, answer, hint = card.get("front"), card.get("answer"), card.get("hint")
+    if not isinstance(answer, str) or not answer.strip():
+        raise ValueError("each card needs a non-empty answer")
+    if not isinstance(hint, str) or not hint.strip():
+        raise ValueError("each card needs a non-empty L1 hint")
+    if not isinstance(front, str) or front.count("___") != 1:
+        raise ValueError("each card front needs exactly one ___")
+    if sum(ch.isalnum() for ch in front.replace("___", "")) < 3:
+        raise ValueError("each card front needs meaningful sentence context around ___")
+
+
 def cmd_due(today):
     deck = load(cards_path(), {"cards": []})["cards"]
     due = [c for c in deck if c.get("due") is None or c["due"] <= today.isoformat()]
@@ -110,6 +124,13 @@ def cmd_add(today):
     new = json.loads(sys.stdin.read())
     if isinstance(new, dict):
         new = [new]
+    if not isinstance(new, list):
+        sys.exit("cards must be a JSON object or array")
+    try:
+        for card in new:
+            validate_card(card)
+    except ValueError as e:
+        sys.exit(f"invalid card: {e}")
     data = load(cards_path(), {"cards": []})
     for card in new:
         card.setdefault("id", uuid.uuid4().hex[:8])
@@ -186,6 +207,17 @@ def selfcheck():
     review(easy, 4, today)
     assert easy["S"] > 10  # Easy on a new card ≈ 11 days
     assert 1.0 <= card["D"] <= 10.0
+    validate_card({"front": "Can I ___ your pen?", "answer": "borrow", "hint": "pedir prestado"})
+    for invalid in ({"front": "___!", "answer": "borrow", "hint": "pedir prestado"},
+                    {"front": "x___", "answer": "borrow", "hint": "pedir prestado"},
+                    {"front": "Can I ___ your pen?", "answer": "borrow"},
+                    {"front": "I borrow your pen.", "answer": "borrow", "hint": "pedir prestado"}):
+        try:
+            validate_card(invalid)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"invalid card accepted: {invalid}")
     print("selfcheck OK")
 
 

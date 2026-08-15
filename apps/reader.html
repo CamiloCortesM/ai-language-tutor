@@ -49,10 +49,7 @@
 <body>
 <header>
   <div class="brand"><b>Tutor</b><span>Reader</span></div>
-  <div style="display:flex;gap:8px">
-    <button class="listen-all" id="shadow-btn">🎤 Shadow</button>
-    <button class="listen-all" id="listen-all">▶ Read to me</button>
-  </div>
+  <button class="listen-all" id="listen-all">▶ Read to me</button>
 </header>
 <main id="main">
   <div class="kicker"><span id="level"></span> · <span id="mins"></span> min read</div>
@@ -74,12 +71,6 @@
     <div class="track" role="progressbar" aria-label="Reading progress"><div id="readbar"></div></div>
     <span class="pct"><span id="pct">0</span>% read</span>
     <span class="col"><span id="collected">0</span> words collected</span>
-  </div>
-  <div class="foot hidden" id="shadowfoot">
-    <span class="pct" style="flex:1">🎤 listen → repeat aloud → next</span>
-    <button class="listen-all" id="sh-rep" aria-label="Replay sentence">↻ Replay</button>
-    <button class="listen-all" id="sh-next" aria-label="Next sentence">Next ▸</button>
-    <button class="listen-all" id="sh-exit" aria-label="Exit shadowing">✕</button>
   </div>
 </footer>
 <script>
@@ -104,18 +95,25 @@
     ],
   };
   let story = DEMO, open = null, openSentence = '', added = [], asked = [], live = false;
+  let eventQueue = Promise.resolve();
   const $ = id => document.getElementById(id);
   const esc = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
 
+  function postEvent(payload) {
+    const body = JSON.stringify(payload); // snapshot before later clicks mutate the arrays
+    eventQueue = eventQueue.then(() => fetch('/api/text', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true,
+    })).catch(() => {});
+  }
+
   let premiumTTS = true, currentAudio = null;
-  async function speak(text, onend, rate) {
+  async function speak(text, onend) {
     if (currentAudio) { currentAudio.pause(); currentAudio = null; }
     if (premiumTTS) {
       try {
         const r = await fetch('/api/tts?text=' + encodeURIComponent(text));
         if (r.status === 200) {
           currentAudio = new Audio(URL.createObjectURL(await r.blob()));
-          if (rate) currentAudio.playbackRate = rate; // browsers preserve pitch by default
           if (onend) currentAudio.onended = onend;
           currentAudio.play();
           return;
@@ -125,13 +123,13 @@
     }
     try {
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = story.lang || 'en-US'; u.rate = rate || 0.92;
+      u.lang = story.lang || 'en-US'; u.rate = 0.92;
       if (onend) u.onend = onend;
       speechSynthesis.cancel(); speechSynthesis.speak(u);
     } catch (e) {}
   }
 
-  // Sentence split for shadowing; merges false splits after common titles.
+  // Sentence spans preserve the exact context when a learner taps a word.
   // ponytail: decimals ("4.5") still split — irrelevant in A-level texts, revisit if a text ever has them.
   function sentences(text) {
     const parts = text.match(/[^.!?…]+[.!?…]+[”"')\]]*\s*|[^.!?…]+\s*$/g) || [text];
@@ -173,7 +171,7 @@
     $('pop-l1').textContent = e ? (e.l1 || e.es || '') : '';
     // Glossary words show their example; unknown words show the sentence they came from.
     $('pop-ex').textContent = e ? (e.example ? '“' + e.example + '”' : '') : (openSentence ? '“' + openSentence + '”' : '');
-    const isAdded = added.includes(key), isAsked = asked.some(a => a.word === key);
+    const isAdded = added.some(a => a.word === key), isAsked = asked.some(a => a.word === key);
     $('pop-add').classList.toggle('hidden', !e || isAdded);
     $('pop-added').classList.toggle('hidden', !e || !isAdded);
     $('pop-ask').classList.toggle('hidden', !!e || isAsked);
@@ -199,69 +197,26 @@
     });
   }
 
-  // Shadow mode: sentence-by-sentence, slower, self-paced — the learner repeats aloud between sentences.
-  const SH = { on: false, p: 0, s: 0 };
-  const SHADOW_RATE = 0.85;
-  function shadowPlay() {
-    const el = document.querySelector(`.s[data-p="${SH.p}"][data-s="${SH.s}"]`);
-    if (!el) return shadowExit();
-    document.querySelectorAll('.s.reading').forEach(x => x.classList.remove('reading'));
-    el.classList.add('reading');
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    speak(el.textContent.trim(), null, SHADOW_RATE);
-  }
-  function shadowNext() {
-    if (document.querySelector(`.s[data-p="${SH.p}"][data-s="${SH.s + 1}"]`)) SH.s++;
-    else { SH.p++; SH.s = 0; }
-    if (!document.querySelector(`.s[data-p="${SH.p}"][data-s="${SH.s}"]`)) return shadowExit();
-    shadowPlay();
-  }
-  function shadowEnter() {
-    SH.on = true; SH.p = 0; SH.s = 0;
-    $('readfoot').classList.add('hidden'); $('shadowfoot').classList.remove('hidden');
-    shadowPlay();
-  }
-  function shadowExit() {
-    SH.on = false;
-    document.querySelectorAll('.s.reading').forEach(x => x.classList.remove('reading'));
-    $('shadowfoot').classList.add('hidden'); $('readfoot').classList.remove('hidden');
-    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-    try { speechSynthesis.cancel(); } catch (e) {}
-  }
-
   document.addEventListener('click', e => {
     const w = e.target.closest('.w');
     const ps = e.target.closest('.pspeak');
     if (w) { e.stopPropagation(); showPop(w.dataset.w, w.closest('.s')?.textContent); return; }
-    if (ps) { e.stopPropagation(); if (SH.on) shadowExit(); speak(story.paragraphs[+ps.dataset.p]); return; }
-    const s = e.target.closest('.s');
-    if (SH.on && s) { SH.p = +s.dataset.p; SH.s = +s.dataset.s; shadowPlay(); return; }
+    if (ps) { e.stopPropagation(); speak(story.paragraphs[+ps.dataset.p]); return; }
     if (!e.target.closest('.pop')) closePop();
   });
-  $('listen-all').addEventListener('click', e => { e.stopPropagation(); if (SH.on) shadowExit(); readAlong(0); });
-  $('shadow-btn').addEventListener('click', e => { e.stopPropagation(); if (!SH.on) shadowEnter(); });
-  $('sh-rep').addEventListener('click', e => { e.stopPropagation(); shadowPlay(); });
-  $('sh-next').addEventListener('click', e => { e.stopPropagation(); shadowNext(); });
-  $('sh-exit').addEventListener('click', e => { e.stopPropagation(); shadowExit(); });
-  window.addEventListener('keydown', e => {
-    if (!SH.on) return;
-    if (e.code === 'Space') { e.preventDefault(); shadowNext(); }
-    else if (e.key === 'r' || e.key === 'R') shadowPlay();
-    else if (e.key === 'Escape') shadowExit();
-  });
+  $('listen-all').addEventListener('click', e => { e.stopPropagation(); readAlong(0); });
   $('pop-speak').addEventListener('click', () => speak(open));
   $('pop-add').addEventListener('click', () => {
-    if (!open || added.includes(open)) return;
-    added.push(open);
+    if (!open || added.some(a => a.word === open)) return;
+    const e = story.glossary[open];
+    added.push({ word: open, sentence: openSentence || e.example || '', def: e.def || '', l1: e.l1 || e.es || '' });
     $('collected').textContent = added.length;
     $('pop-add').classList.add('hidden');
     $('pop-added').classList.remove('hidden');
     if (live) {
-      const e = story.glossary[open];
       // added/asks ride along cumulatively: the single event file gets overwritten per POST,
       // so the last event always carries the full session state.
-      fetch('/api/text', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addWord: open, def: e.def, example: e.example, l1: e.l1 || '', added, asks: asked }) }).catch(() => {});
+      postEvent({ addWord: open, added, asks: asked });
     }
   });
   $('pop-ask').addEventListener('click', () => {
@@ -270,8 +225,7 @@
     $('pop-ask').classList.add('hidden');
     $('pop-asked').classList.remove('hidden');
     if (live) {
-      fetch('/api/text', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ askWord: open, sentence: openSentence, added, asks: asked }) }).catch(() => {});
+      postEvent({ askWord: open, sentence: openSentence, added, asks: asked });
     }
   });
   window.addEventListener('scroll', () => {

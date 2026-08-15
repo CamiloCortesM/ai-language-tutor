@@ -10,22 +10,23 @@ Short daily budgets can't fit four strands, so balance **across the last 7 days*
 
 ## 2. Comprehensible input
 
-Generated or chosen texts/audio keep **95–98% of words within `student/known_words.txt`** (plus proper nouns and transparent cognates for that learner's L1). The 2–5% new words are the unit's target vocabulary. If the learner struggles with a text, the ratio was wrong — regenerate easier; never push through.
+Generated or chosen texts/audio keep **95–98% of words within `student/<active>/known_words.txt`** (plus proper nouns and transparent cognates for that learner's L1). The 2–5% new words are the unit's target vocabulary. If the learner struggles with a text, the ratio was wrong — regenerate easier; never push through.
 
 ## 3. Vocabulary & SRS
 
-- Card format: **word-first with a real example**. Word side: `word` (lemma/phrase/chunk) big, `sound` (how it sounds, spelled in the learner's L1 orthography — *bó·rrou* for a Spanish speaker), `ipa`, `pos`, and the example sentence with the word marked — TTS of word + example on request. Meaning side: `hint` (the meaning in the learner's L1 — the main answer), `definition` (simple target-language), `translation` (of the example, learner's L1), `senses` (optional: other common meanings and near-neighbours, in the learner's L1, one line — reference, not a thing to memorize), and the card's image if it has one. Stored fields per card: `front` (example sentence with `___` where the word goes), `answer` (the form used in it), plus the fields above.
+- Card format: **sentence-first contextual cloze**. The front shows one natural, complete target-language sentence with exactly one `___`, plus `hint` (a brief L1 meaning that makes the intended answer unambiguous). The learner retrieves the missing word, phrase or chunk. The back reveals `word` (lemma/chunk), `answer` (the exact inflected form), `sound` (L1-friendly pronunciation, e.g. *bó·rrou* for a Spanish speaker), `ipa`, `pos`, the completed sentence, `definition` (simple target-language), `translation` (of the whole sentence), optional `senses`, and an image when useful. TTS reads the completed sentence only after reveal.
 - **Images for imageable words**: right after `add`, run `python3 tools/srs.py img <card-id> "<simple visual query in the target language>"` — downloads one CC image (Openverse, no key) into `student/<lang>/img/` and links it to the card; it shows on the meaning side. Concrete nouns/verbs/adjectives only — never force an image onto grammar words or abstractions (a bad image teaches the wrong thing); skipping is normal.
-- The example sentence must use the word naturally — ideally taken from the learner's own life, errors or readings. Generic dictionary frames are bad cards. Contrastive warnings ("nunca *borned*") go in `senses`.
+- The sentence must use the answer naturally and provide useful grammar or collocation — ideally taken from the learner's own life, errors or readings. Generic dictionary frames are bad cards; so are contexts with several equally plausible answers. Contrastive warnings ("nunca *borned*") go in `senses`.
 - Sources of new cards, in priority order: learner's own errors > unit target vocab > words tapped in reading > placement gaps.
 - **≤15 new cards/day.** Reviews always come before new material in a session.
 - **Backlog rule:** more than ~30 cards due (e.g. after days away) → add ZERO new cards until the queue is cleared; review the most overdue first, in chunks of ≤30, across as many days as needed. Welcome the learner back warmly — never guilt-trip about the pile; late reviews they still remember actually strengthen memory more (FSRS rewards the harder recall).
-- Multiple senses/collocations of one word = separate cards. At very early A1 a card may ship without an example sentence; add one as soon as sentences are viable.
+- Multiple senses/collocations of one word = separate cards. A1 still uses complete sentences, just very short ones (*I ___ coffee*); no context-free exception.
+- Evidence does **not** support the absolute claim that isolated word pairs never work: they can efficiently establish an initial form–meaning link, and one sentence is not automatically better. This tutor defaults to contextual cloze because its goal is usable knowledge — meaning, form, grammar and collocation — while overt retrieval, feedback and spacing remain the retention engine (`docs/research/evidence-based-methods.md` §4–5).
 - Words the learner produces correctly and unprompted across ≥3 different sessions → `known_words.txt`.
 
 ## 4. Corrections (prompts before answers)
 
-- **In conversation (chat)**: reply in character, and when the learner's turn had an error worth fixing append ONE footnote correction, visually apart from the roleplay (`✏️ *she don't like* → *she doesn't like*`) — max one per turn, most damaging first, never a lecture; the story keeps moving. Interrupt the flow itself only when communication actually breaks. **By voice**: no interruptions; quick recasts in the moment are the voice AI's job (instructed via the Lesson Pass). Either way the activity ends with a `CORRECTIONS` block: **max 3 items**, most damaging first. For ONE of them, prompt self-correction before revealing ("You said 'I have seen him yesterday' — yesterday is a finished time, so which tense?"). Each item: error → fix → one-line why.
+- **In conversation (always voice)**: note errors silently and do not interrupt; only when communication breaks, ask a short clarification prompt. The finite voice plan ends with **max 3 corrections**, most damaging first. For ONE of them, prompt self-correction before revealing ("You said 'I have seen him yesterday' — yesterday is a finished time, so which tense?"). Each item: error → fix → one-line why.
 - **In writing**: focused feedback — pick the **2–3 error types** that matter most at their level, mark all instances of those, ignore the rest for now. Then: corrected version + 3 prioritized improvements.
 - Every correction-worthy error goes to `errors.md`; recurring ones (3+) become cards and the topic of the next grammar micro-lesson.
 
@@ -72,7 +73,7 @@ Rotation for one-activity days: conversation → reading → listening → writi
 
 ## 9. Leveling up
 
-A level is passed when: all its units are completed **and** the learner scores **≥70% on the exam simulation including the spoken paper** (no B1+ without demonstrated speaking). Failing = targeted review plan from the exam's error profile, retake in ≥1 week.
+A level is passed when all its units are completed and the learner scores **≥70% overall and ≥60% on every exam paper, including speaking**. Failing = targeted review plan from the exam's error profile, retake in ≥1 week.
 
 **Weekly check** (`activities/weekly-check.md`): every ~7 study days, a 15–20 min four-skill pulse — listening, reading, writing, speaking — built from that week's material and weighted toward the current weak spot. It never gates levels; its job is to show the learner what improved and to set `focus` in `progress.json`, which biases the next week's session plans. This is how the tutor stays pointed at what *this* learner needs.
 
@@ -80,8 +81,8 @@ A level is passed when: all its units are completed **and** the learner scores *
 
 The tutor teaches HOW to do each activity, not only what to do:
 
-- **First time** an activity type appears for this learner: a 3–4 line "how to get the most out of this" with the why (one line of the evidence behind it). Example for reading: *"1) Read it once without stopping — just get the story. 2) Second pass: tap ONLY words that block understanding; try to guess the rest from context (guessing is where learning happens). 3) Then hit Read-to-me and read along aloud, imitating the voice — that's shadowing, it trains your ear and mouth at once."*
-- **On drift**, remind briefly: tapping every word → "guess first, tap what still blocks you"; translating word-by-word while writing → "write your idea directly in English, simpler is fine"; reading corrections without re-saying them → "say the fixed sentence out loud once".
+- **First time** an activity type appears for this learner: a 3–4 line "how to get the most out of this" with the why (one line of the evidence behind it). Example for reading: *"1) Read it once without stopping — just get the story. 2) Second pass: tap ONLY words that block understanding; try to guess the rest from context. 3) Then hit Read-to-me and follow the text — connect sound, spelling and phrasing."*
+- **On drift**, remind briefly: tapping every word → "guess first, tap what still blocks you"; translating word-by-word while writing → "write your idea directly in the target language, simpler is fine"; skipping a required spoken correction → return to its voice-model step.
 - Never repeat the full lecture to someone already doing it right — one line or silence.
 
 ## 11. Extensive viewing (movies & series)
@@ -95,7 +96,7 @@ Real film/TV is bonus input **outside session time** — a plus, never a daily r
   - **B2**: target subtitles on first viewing; rewatch a favorite scene subtitle-free.
   - **C1**: no subtitles; turn them on only to rescue a lost scene.
 - Material by level: A1–A2 animation/kids' shows & familiar rewatches · B1 sitcoms & shows they've seen dubbed · B2 dramas and films · C1 anything, including fast comedy and strong regional accents.
-- **One technique tip per recommendation, rotating** (never the full list): jot max 3–5 new expressions, not every word · rewatch one scene and shadow a line aloud · dual-subtitle/per-sentence-pause browser tools for ONE scene, not the whole film · pause and predict the next line · watch the trailer first as a warm-up · rewatch the same episode a week later and notice the difference.
+- **One technique tip per recommendation, rotating** (never the full list): jot max 3–5 new expressions, not every word · replay one scene and notice one line's rhythm · dual-subtitle/per-sentence-pause browser tools for ONE scene, not the whole film · pause and predict the next line · watch the trailer first as a warm-up · rewatch the same episode a week later and notice the difference.
 - **Follow up next session (2 min, chat not quiz):** what happened? what stuck? Their jotted expressions → cards (count toward the daily 15). Log in history notes as `viewing: recommended <the menu>` and, once they pick, `viewing: watched "Title"` — the follow-up asks about the one they chose, not the whole menu. A month with zero watched → warm nudge (it's the cheapest listening practice there is), never guilt.
 
 ## 12. Tone

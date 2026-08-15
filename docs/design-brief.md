@@ -6,7 +6,7 @@
 
 ## The prompt
 
-You are designing the visual layer of **an open-source AI language tutor**: a repo that turns any AI coding agent into a personal language tutor with memory. The agent handles conversation and lessons in chat; four self-contained HTML apps handle the visual, interactive activities. Design and build all four screens plus a shared theme, with strong visual coherence — they must feel like one product.
+You are designing the visual layer of **an open-source AI language tutor**: a repo that turns any AI coding agent into a personal language tutor with memory. The agent handles lessons in chat and speaking through a voice model; five self-contained HTML apps handle visual activities. Design and build all five screens plus a shared theme, with strong visual coherence — they must feel like one product.
 
 ### Product personality
 
@@ -24,17 +24,19 @@ Warm, focused, encouraging — a beautiful study desk, not a casino. Think "mode
 
 **1. `dashboard.html` — home.** The first thing the learner sees. Hero row: streak (flame + big number), daily-goal ring, current level chip (A1…C1) with progress bar to next level. Below: vocabulary growth area chart (known words over time), a "due today" card count with CTA to flashcards, and a compact "your top 3 recurring errors" list. One primary CTA: **Start today's session**. Empty states matter: day 0 should look inviting, not blank.
 
-**2. `flashcards.html` — SRS review.** One card centered, everything else recedes. Front: the word in large display type, IPA + part of speech under it, a speaker button that pronounces it. Tap/space to flip — 3D rotation reveals the meaning in the learner's L1 (prominent), a simple definition, a real example sentence with the word highlighted, its translation small underneath. Four grade buttons (Again/Hard/Good/Easy) in the fixed color scale, with next-interval preview under each ("<10m · 2d · 4d · 8d"). Thin session progress bar on top. End screen: cards reviewed, accuracy, streak update — one glance, one button out. Keyboard: space = flip, 1–4 = grade.
+**2. `flashcards.html` — SRS review.** One card centered, everything else recedes. Front: a complete sentence in large type with exactly one cloze blank, plus a small L1 meaning cue; no audio can reveal the answer yet. Tap/space to flip — 3D rotation reveals the word/chunk, pronunciation, the completed sentence with the answer highlighted, L1 meaning, simple definition, translation and optional image. Audio reads the completed sentence only after reveal. Four grade buttons (Again/Hard/Good/Easy) keep the fixed color scale and interval previews. Keyboard: space = flip, 1–4 = grade.
 
 **3. `quiz.html` — written test.** One question at a time, progress dots on top. Question types: multiple choice (big tappable option cards), gap-fill (inline input in the sentence), sentence reorder (tappable word chips). Instant feedback per question: chosen option turns green/coral, one-line explanation appears below, then a Next button — never auto-advance on a wrong answer. Final screen: score ring, per-question review list (✓/✗ with corrections), "errors were added to your deck" note.
 
 **4. `reader.html` — assisted reading.** The most typographic screen: the story set like a beautiful book page (comfortable measure, generous leading). New-for-this-learner words are softly highlighted; tapping one opens a small popover: definition, example sentence, [+ add to deck] which morphs into a checkmark. Per-paragraph speaker buttons for TTS read-along. Footer: reading progress and count of words collected this session.
 
+**5. `dictation.html` — precision listening.** A compact stack of generated sentences, each with its own learner-controlled audio player and transcript folded behind “show text.” The learner writes in chat, then reveals the matching sentence to check it; no answer appears automatically.
+
 ### Technical constraints (hard)
 
 - Each app is ONE self-contained HTML file (inline CSS/JS) that links only the shared `theme.css`. Vanilla JS, no frameworks, no build step, no external CDNs/fonts — must work fully offline.
-- Data comes from tiny local endpoints (`/api/deck`, `/api/progress`, `/api/quiz`, `/api/text`) served by a stdlib Python server; POST results back to matching endpoints. Design must degrade gracefully to demo/sample data when endpoints are absent (so the files also open standalone via file://).
-- Audio = browser `speechSynthesis` only.
+- Data comes from tiny local endpoints (`/api/deck`, `/api/progress`, `/api/quiz`, `/api/text`, `/api/dictation`, `/api/tts`) served by a stdlib Python server; POST results back to matching endpoints. Design must degrade gracefully to demo/sample data when endpoints are absent (so the files also open standalone via file://).
+- Audio uses `/api/tts` when configured and browser `speechSynthesis` as the local fallback.
 - Mobile-first responsive: flawless from 360px phone to desktop; thumb-reachable primary actions on mobile.
 - Accessibility: WCAG AA contrast in both themes, visible focus states, full keyboard operation (flashcards and quiz especially), aria-labels on icon buttons. Light + dark via `prefers-color-scheme`.
 
@@ -47,4 +49,4 @@ Same tokens everywhere; same top bar everywhere; the four grade colors never cha
 ## Notes
 
 - The agent generates activity content (quiz JSON, graded texts, deck data) — apps only present and grade it. Keep content and presentation decoupled.
-- `reader.html` ships in Phase 2; design it now anyway so the system is complete from day one.
+- All five apps ship; keep demo data so each remains inspectable without learner files.

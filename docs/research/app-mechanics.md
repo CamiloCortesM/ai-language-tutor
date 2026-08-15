@@ -29,7 +29,7 @@ Recommended base architecture for everything: data lives in **markdown/JSON** (d
 ## 4. Clozemaster — sentence mining with cloze
 **Key mechanic:** learn vocabulary **inside real sentences**, not isolated words. Presents a sentence with one word blanked (cloze deletion) that you must complete; the sentence gives context, collocations and grammar for free. Combined with SRS.
 
-**Replicate simply:** it's the best card format for the SRS in point 1. `make-cloze` skill: given a text or a target word, the agent generates natural sentences at the right level with the target word masked, saves `{sentence_with_blank, answer, full_sentence, translation}` to `cards.json`. Review shows the gapped sentence; correct → grade Good. Generate sentences from the learner's own input (articles, subtitles) so content stays relevant = real "sentence mining".
+**Replicate simply:** use contextual cloze for the SRS in point 1. Given a text or target word, the agent takes a natural sentence at the right level, masks one answer and saves it to `cards.json`. Review shows the gapped sentence; reveal supplies immediate feedback. Prefer the learner's own input (articles, subtitles, errors) so content stays relevant = real sentence mining.
 
 ## 5. ELSA Speak — pronunciation assessment
 **Key mechanic:** **phoneme-level** assessment, not word-level. Compares your audio against native pronunciation models and gives color-coded feedback (green/yellow/red) per sound, plus prosody (intonation, lexical stress, fluency). It points at exactly which sound you missed, not a global score.
@@ -54,6 +54,6 @@ Recommended base architecture for everything: data lives in **markdown/JSON** (d
 - **Voice-conversation pipeline in CLI:** record audio (`sox`/`ffmpeg`) → whisper.cpp transcribes → text to the agent (`conversation` skill) → response → `say` or Piper speaks it. All orchestrable in a ~30-line bash script.
 
 ---
-**Minimum viable loop tying it all together:** profile (level) + `cards.json` (SRS with cloze) + `errors.md`. Session: (1) show streak, (2) review due cards with FSRS, (3) 5-min conversation, (4) the agent extracts new errors → generates cloze cards → adds them to the SRS. Start with SRS+cloze+conversation (text); add voice and exams later.
+**Minimum viable loop tying it all together:** profile (level) + `cards.json` (SRS with cloze) + `errors.md`. Session: (1) show streak, (2) review due cards with FSRS, (3) a short voice conversation, (4) the agent extracts new errors → generates cloze cards → adds them to the SRS.
 
 **Sources:** [FSRS/awesome-fsrs wiki](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/ABC-of-FSRS) · [Domenic on FSRS](https://domenic.me/fsrs/) · [Talkio: best AI speaking apps 2026](https://www.talkio.ai/blog/best-ai-language-speaking-practice-apps-in-2026) · [Univerbal: AI language learning](https://blog.univerbal.app/ai-language-learning) · [ELSA Score explained](https://medium.com/@elsaspeak/discover-your-elsa-score-an-ai-powered-visualization-of-your-english-speaking-proficiency-in-369f46dba6bc) · [luisalima/local-whisper (whisper.cpp macOS)](https://github.com/luisalima/local-whisper) · [Borderset: Claude/ChatGPT prompts for English](https://www.borderset.com/blogs/posts/claude-and-chatgpt-prompts-for-learning-english)
