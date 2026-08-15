@@ -34,4 +34,5 @@ Each step follows its own file in `activities/`. Between steps: one transition l
 2. Write-backs per AGENTS.md: errors, new cards (≤15/day), mastered words, `history` entry (date, activities, minutes, `speaking_debt` flags, one-line notes).
 3. Advance `unit` in progress.json if its material was completed.
 4. 1–2× per week (check recent history for the last `viewing:` note): recommend a menu of 3–4 movies/episodes per methodology §11 — matched to level and interests, with the subtitle setup and one rotating technique tip. Log the menu in the history notes.
-5. Close with: what improved today + streak + a one-line teaser of tomorrow.
+5. After all app events and write-backs, run `python3 tools/serve.py stop`; confirm the local app server is stopped. This command is safe when no server is running.
+6. Close with: what improved today + streak + a one-line teaser of tomorrow.

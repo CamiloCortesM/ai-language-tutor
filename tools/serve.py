@@ -5,7 +5,11 @@ Serves apps/ statically plus a tiny JSON API over student/ data.
 On every result POST it writes student/.event-<app>.json so the tutor can
 wait on that file and resume the session automatically.
 
-Usage: python3 tools/serve.py [port]     (default 8765)
+Usage:
+  python3 tools/serve.py [port]  start (default port 8765)
+  python3 tools/serve.py status  check this project's server
+  python3 tools/serve.py stop    stop this project's server
+  python3 tools/serve.py selfcheck
 
 API:
   GET  /api/deck      due cards
@@ -19,9 +23,15 @@ API:
   GET  /api/img/<f>   card image from student/<lang>/img/
 """
 import json
+import os
 import re
+import secrets
 import sys
+import threading
+import time
+import urllib.error
 import urllib.parse
+import urllib.request
 from datetime import date, datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -33,10 +43,61 @@ import tts
 ROOT = Path(__file__).resolve().parent.parent
 STUDENT = ROOT / "student"
 APPS = ROOT / "apps"
+CONTROL = STUDENT / ".serve.json"
 
 
 def read_json(path, default):
     return json.loads(path.read_text()) if path.exists() else default
+
+
+def read_control():
+    try:
+        data = read_json(CONTROL, None)
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(data, dict) or not isinstance(data.get("port"), int) \
+            or not isinstance(data.get("token"), str):
+        return None
+    return data
+
+
+def control_request(action, method="GET", timeout=2):
+    data = read_control()
+    if data is None:
+        raise RuntimeError("no server control file")
+    token = urllib.parse.quote(data["token"])
+    url = f"http://127.0.0.1:{data['port']}/api/{action}?token={token}"
+    request = urllib.request.Request(url, method=method)
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return json.loads(response.read())
+
+
+def server_status():
+    try:
+        result = control_request("health")
+    except (OSError, RuntimeError, urllib.error.URLError, json.JSONDecodeError):
+        return None
+    return read_control() if result.get("ok") else None
+
+
+def stop_server():
+    if read_control() is None:
+        print("server not running")
+        return 0
+    try:
+        control_request("shutdown", method="POST")
+    except (OSError, RuntimeError, urllib.error.URLError, json.JSONDecodeError) as exc:
+        print(f"server did not respond; control file kept: {exc}", file=sys.stderr)
+        return 1
+    for _ in range(40):
+        if not CONTROL.exists():
+            break
+        time.sleep(0.05)
+    if CONTROL.exists():
+        print("shutdown requested but not confirmed", file=sys.stderr)
+        return 1
+    print("server stopped")
+    return 0
 
 
 def write_event(app, payload):
@@ -108,6 +169,12 @@ class Handler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/health":
+            token = (urllib.parse.parse_qs(parsed.query).get("token") or [""])[0]
+            if not secrets.compare_digest(token, self.server.shutdown_token):
+                return self._json({"error": "forbidden"}, 403)
+            return self._json({"ok": True})
         if self.path.startswith("/api/tts"):
             qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             text = (qs.get("text") or [""])[0].strip()
@@ -156,6 +223,14 @@ class Handler(SimpleHTTPRequestHandler):
             super().do_GET()
 
     def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/shutdown":
+            token = (urllib.parse.parse_qs(parsed.query).get("token") or [""])[0]
+            if not secrets.compare_digest(token, self.server.shutdown_token):
+                return self._json({"error": "forbidden"}, 403)
+            self._json({"ok": True})
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
+            return
         length = int(self.headers.get("Content-Length", 0))
         try:
             body = json.loads(self.rfile.read(length) or b"{}")
@@ -189,11 +264,65 @@ class Handler(SimpleHTTPRequestHandler):
         pass
 
 
+def selfcheck():
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    server.shutdown_token = secrets.token_urlsafe(24)
+    port = server.server_address[1]
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    token = urllib.parse.quote(server.shutdown_token)
+    with urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/api/health?token={token}", timeout=2) as response:
+        assert json.loads(response.read()) == {"ok": True}
+    request = urllib.request.Request(
+        f"http://127.0.0.1:{port}/api/shutdown?token={token}", method="POST")
+    with urllib.request.urlopen(request, timeout=2) as response:
+        assert json.loads(response.read()) == {"ok": True}
+    thread.join(timeout=2)
+    server.server_close()
+    assert not thread.is_alive()
+    print("server selfcheck OK")
+
+
 def main():
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
+    command = sys.argv[1] if len(sys.argv) > 1 else None
+    if command == "stop":
+        raise SystemExit(stop_server())
+    if command == "status":
+        data = server_status()
+        print(f"server running on http://localhost:{data['port']}" if data else "server not running")
+        raise SystemExit(0 if data else 1)
+    if command == "selfcheck":
+        selfcheck()
+        return
+
+    running = server_status()
+    if running:
+        print(f"server already running on http://localhost:{running['port']}")
+        return
+    if CONTROL.exists():
+        CONTROL.unlink()
+
+    port = int(command) if command else 8765
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"serving apps/ on http://localhost:{port} — Ctrl-C to stop")
-    server.serve_forever()
+    server.shutdown_token = secrets.token_urlsafe(24)
+    port = server.server_address[1]
+    STUDENT.mkdir(exist_ok=True)
+    CONTROL.write_text(json.dumps({
+        "pid": os.getpid(), "port": port, "token": server.shutdown_token,
+        "root": str(ROOT),
+    }, indent=2) + "\n")
+    print(f"serving apps/ on http://localhost:{port} — run 'python3 tools/serve.py stop' to stop",
+          flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+        current = read_control()
+        if current and secrets.compare_digest(current["token"], server.shutdown_token):
+            CONTROL.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

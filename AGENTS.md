@@ -57,11 +57,13 @@ Platform note: all tooling is OS-agnostic (Python stdlib + browser). For event-f
 
 Available: `flashcards.html` (SRS review), `quiz.html` (unit checkpoints), `reader.html` (assisted reading with read-along), `dictation.html` (listening dictation, learner-controlled replay), `dashboard.html` (progress). If a browser is available, prefer them for SRS, quizzes, reading and precision dictation. Live listening and every learner-speaking step use the saved `voice-required` route, never the browser. Flow:
 
-1. Start the server if not running: `python3 tools/serve.py` (background; port 8765).
+1. Start the server if needed: `python3 tools/serve.py` (background; port 8765). It detects and reuses this project's existing instance instead of starting a duplicate.
 2. For quiz: first write `student/quiz-current.json` — `{"title": ..., "questions": [{"type": "choice|gap|reorder", "prompt", "options"?, "correct"?, "answers"?: [accepted strings], "words"?, "answer"?, "display"?, "explain"}]}`. Vocabulary questions always use a complete sentence; gap prompts embed the L1 hint: `"Can I ___ your pen? (pedir prestado)"`. For reader: first write `student/reading-current.json` — `{"title", "level", "minutes", "lang"?: BCP47 for TTS (default en-US), "glossary": {word: {"def", "l1": translation in the learner's native language, "example"}}, "paragraphs": [...]}` — glossary keys are the lowercase new words; every target word must appear in the text. For dictation: write `student/dictation-current.json` — `{"title", "label"?: word before the number (default "Sentence"), "sentences": [{"en", "es", "note"?}]}` — the app builds one `<audio>` per sentence straight off `/api/tts` and keeps the text folded away until the learner opens it.
 3. Delete any stale `student/.event-<app>.json`, then open `http://localhost:8765/<app>.html`.
 4. Wait for the event file (shell wait, 15-minute timeout). Read it, delete it, comment on the results, continue the session. Flashcard grades are applied server-side automatically; quiz misses are yours to turn into cards.
 5. If your harness can't run a waiting command, ask the learner to say "done".
+
+Keep the server alive between app activities in the same session. After the final app event and all write-backs, run `python3 tools/serve.py stop` when the daily session ends or the learner says they are done for today. Confirm `server stopped` or `server not running` before the final message. If controlled shutdown fails, inspect only the process/session started for this project; never use a broad process-kill command.
 
 No browser → the chat protocols for app-backed text activities still work fully; voice-required activities keep their saved voice route.
 

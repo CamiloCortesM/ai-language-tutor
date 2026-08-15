@@ -36,7 +36,9 @@ From then on, your daily class is one word: **`session`**. In Claude Code, Curso
 
 The tutor reads your memory, greets you with your streak and due cards, and runs a plan shaped to your daily minutes — for example: 10' flashcard review → 15' reading at 95–98% known words → 15' spoken roleplay → 5' grammar targeting your most repeated error. Every activity writes back what it learned about you: new errors become flashcards, mastered words unlock harder texts, and tomorrow's class starts where today's ended.
 
-Speaking steps are enforced, not optional — you cannot pass B1 without a spoken exam. Setup asks once where voice is available and reuses that route automatically. If it is unavailable, the tutor defers the spoken step and tracks the debt; it never pretends typing was speaking. The finite [voice bridge](portable/voice-tutor.md) supports Codex/Work and external voice projects.
+Speaking steps are enforced, not optional — you cannot pass B1 without a spoken exam. Setup asks once whether an external voice AI is available and reuses that route automatically. If it is unavailable, the tutor defers the spoken step and tracks the debt; it never pretends typing was speaking. The finite [voice bridge](portable/voice-tutor.md) sends one complete prompt plus Lesson Pass JSON; the report is delivered automatically at completion or requested in text immediately after the call.
+
+Browser activities use one localhost server that is reused during the session and shut down automatically at the daily wrap-up. Manual controls are `python3 tools/serve.py status` and `python3 tools/serve.py stop`; shutdown targets only this project's authenticated local instance.
 
 ## Languages
 

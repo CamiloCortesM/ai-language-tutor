@@ -74,6 +74,8 @@ learning-language/
 
 Visual activities live in `apps/` as self-contained HTML pages served by `tools/serve.py` (Python stdlib, no framework): it serves the static files and exposes tiny GET/POST endpoints over `student/` data. The agent generates activity content and opens the app; the app handles presentation, grading and saving. `/api/tts` uses the configured provider, with browser `speechSynthesis` as fallback. Text teaching stays in chat; learner-speaking activities use the saved voice-model route.
 
+The server writes a gitignored `student/.serve.json` control file containing its port and a random shutdown token. Repeated starts reuse the live project instance. Daily wrap-up calls `python3 tools/serve.py stop`, which authenticates over loopback and shuts down only that server; stale control files are replaced on the next start.
+
 ## Interaction modes: text vs. required voice
 
 Every activity declares a mode; the learner is never asked to choose text versus voice:
