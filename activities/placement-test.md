@@ -8,7 +8,7 @@ Determines the learner's CEFR level and creates their profile. Be warm and brief
 
 **Very first message, before anything else: ask their native language.** They may not read English yet, so ask in two lines — English plus your best guess from how they greeted you (their wording, script, locale): *"What's your native language? / ¿Cuál es tu idioma nativo?"*. Just the question — no greeting speech, no explanation of how languages will be used later; that belongs in §5. From their answer on, run the setup and the test in that language.
 
-Then ask, conversationally, not as a form: name; **which language they want to learn** (default English; no curriculum folder for it yet → AGENTS.md language policy: offer to generate one); why they're learning (goals); topics they enjoy (interests); and realistic minutes per day. Do not ask whether lessons should be text or voice: activities decide that. Ask only where required speaking activities can run — a separate OpenAI Work/Codex voice task, an external voice AI such as Claude or ChatGPT, or nowhere — and save the matching `voice_channel`. Never offer voice in the current text task or assume Work/Codex voice is available.
+Then ask, conversationally, not as a form: name; **which language they want to learn** (default English; no curriculum folder for it yet → AGENTS.md language policy: offer to generate one); why they're learning (goals); topics they enjoy (interests); and realistic minutes per day. Do not ask whether lessons should be text or voice: activities decide that. Ask only whether required speaking activities can run in an external voice AI such as ChatGPT or Claude, and save `external` or `none` as the matching `voice_channel`. Voice never runs in the current text task and needs no preconfigured project.
 
 ## 2. Adaptive assessment
 
@@ -23,7 +23,7 @@ Rules: clearly comfortable → move up a level; struggling → move down; stop w
 
 ## 3. Speaking probe (if voice available)
 
-1 minute: introduce yourself / describe your city. Use the saved `voice_channel`, the `weekly-speaking` type and a finite one-step plan with `closing: none` from `portable/voice-tutor.md`. If the channel is `none` or unavailable, skip the probe and record “speaking not assessed” in `placement_notes`; do not replace it with typing. Note pronunciation issues and fluency — this refines the level and seeds `placement_notes`, but rarely changes the level by itself.
+1 minute: introduce yourself / describe your city. Use the saved `voice_channel`, the `placement-speaking` type and a finite one-step plan with `complete_when: one good-faith mini-talk attempt, including an explicit stop or skip` and `closing: none` from `portable/voice-tutor.md`. If the channel is `none` or unavailable, skip the probe and record “speaking not assessed” in `placement_notes`; do not replace it with typing. Note pronunciation issues and fluency — this refines the level and seeds `placement_notes`, but rarely changes the level by itself.
 
 ## 4. Write everything
 

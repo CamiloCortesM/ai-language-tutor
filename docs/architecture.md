@@ -4,7 +4,7 @@
 
 ## Design principles
 
-1. **Portable / harness-agnostic.** Everything the tutor needs lives in markdown that any AI agent (Claude Code, Codex, Cursor, Gemini CLI…) can read. Entry point: `AGENTS.md` (a convention most agents already support); `CLAUDE.md` just redirects to it. "Skills" are plain markdown files in `activities/` — instructions, not proprietary code.
+1. **Portable / harness-agnostic.** Everything the tutor needs lives in markdown that any AI agent (Claude Code, Cursor, Gemini CLI…) can read. Entry point: `AGENTS.md` (a convention most agents already support); `CLAUDE.md` just redirects to it. "Skills" are plain markdown files in `activities/` — instructions, not proprietary code.
 2. **The LLM is the tutor; files are the memory; scripts are the clock.** Code exists only where the LLM is a poor substitute: SRS scheduling (FSRS) and the streak. Everything else (generating texts, correcting, conversing, examining) is instructions.
 3. **Multi-language by design — on both sides.** The method (`activities/`, `docs/methodology.md`) is language-agnostic. Everything specific to a **target** language lives under `languages/<target>/` (curriculum, vocab lists); English ships first, adding a language = adding a folder. The learner's **native** language (any L1) is just a profile field: curriculum files are target-language-only, and all L1-specific material — hints, translations, contrastive explanations — is generated at runtime for that learner. Optional `l1-notes/<L1>.md` files capture known pitfalls per language pair (Spanish ships first); when absent, the tutor uses its own contrastive knowledge.
 4. **Multi-user.** Learner data lives in `student/` (gitignored). The repo ships `student.example/` as a template; the placement test fills it in on first use.
@@ -66,7 +66,8 @@ learning-language/
 └── tools/
     ├── srs.py             # FSRS (minimal formulas) + due list + streak. Python stdlib.
     ├── serve.py           # stdlib server: serves apps/ + JSON API over student/
-    └── tts.py             # neural TTS (edge-tts free / OpenAI / ElevenLabs) with cache
+    ├── tts.py             # neural TTS (edge-tts free / OpenAI / ElevenLabs) with cache
+    └── voice_selfcheck.py # verifies the durable external-voice contract
 ```
 
 ## HTML apps
@@ -82,7 +83,7 @@ Every activity declares a mode; the learner is never asked to choose text versus
 | `chat` | Interaction stays in text; app/TTS audio may supply listening material | SRS, reading, writing, grammar, quiz, precision listening |
 | `voice-required` | The learner must speak to a voice model | conversation at every level, pronunciation production, fluency, story/live listening, weekly/exam speaking |
 
-Setup stores one `voice_channel`: a separate Codex/Work voice task or an external voice project. The tutor reuses it automatically for `voice-required` steps; the learner may override it explicitly. Both handoff routes use the same finite `STEP_N → optional CORRECTION → FINISHED` controller in `portable/voice-tutor.md`. With no available route, the step is deferred and `speaking_debt` is logged — typing never completes speaking.
+Setup stores `voice_channel` as `external` or `none`. For every `voice-required` step, the tutor emits one self-contained block with the finite `STEP_N → optional CORRECTION → FINISHED` controller, the A1–C1 language-support policy and a populated Lesson Pass JSON from `portable/voice-tutor.md`. The external chat returns Lesson Report JSON automatically or after a fixed post-call text request. No preconfigured project or prior chat memory is required. With no available route, the step is deferred and `speaking_debt` is logged — typing never completes speaking.
 
 The daily session plan shows each step's mode up front (e.g. 🎙️ = you will speak). Level-up exams always include the spoken paper — you cannot reach B1+ without demonstrated speaking.
 
@@ -110,5 +111,4 @@ The daily session plan shows each step's mode up front (e.g. 🎙️ = you will 
 ## Deliberate simplifications (and their ceilings)
 
 - `ponytail:` FSRS with default weights and minimal formulas in stdlib; run the optimizer only if a user accumulates thousands of reviews.
-- `ponytail:` pronunciation scoring = whisper transcription vs. target text (catches gross errors); true phoneme-level scoring needs an external API (Azure Pronunciation Assessment) — documented as an optional extension.
 - `ponytail:` five plain local HTML apps, no frontend framework and no database; flat JSON/markdown remains the source of truth.

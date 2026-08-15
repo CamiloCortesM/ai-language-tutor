@@ -8,7 +8,7 @@ Turn any AI coding agent into a personal language tutor with memory — a full C
 
 Beyond your AI coding agent, the core needs no additional account, subscription or remote server. The **agent is the tutor** (it teaches, corrects, converses and examines you), **plain files are the memory** (your level, errors, vocabulary and streak persist between sessions), and **one small script is the clock** (FSRS, the modern spaced-repetition algorithm). Everything is built on evidence-based language pedagogy — see [`docs/methodology.md`](docs/methodology.md).
 
-Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anything that reads `AGENTS.md`. macOS, Windows and Linux.
+Works with **Claude Code, Cowork, Cursor, OpenCode and Gemini CLI** — anything that reads `AGENTS.md`. macOS, Windows and Linux.
 
 ## Features
 
@@ -16,7 +16,7 @@ Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anyt
 - **Daily sessions** — one word (`session`) plans your day: spaced review, comprehensible reading, conversation, writing, pronunciation… balanced across the week and fitted to the minutes you have.
 - **Real curriculum** — 60 CEFR units for English (A1→C1): criterial grammar, vocabulary, functions and Cambridge-style level exams.
 - **Spaced repetition** — sentence-first cloze cards: retrieve a word or chunk inside a real sentence, then reveal its pronunciation, completed context, meaning and optional picture. Scheduled with FSRS and generated from *your* errors and readings.
-- **Speaking that counts** — normal lessons stay in text; conversation, fluency, pronunciation and spoken exams automatically use the voice route saved during setup. One finite controller supports separate Codex/Work voice tasks and external voice projects.
+- **Speaking that counts** — normal lessons stay in text; conversation, fluency, pronunciation and spoken exams use a detailed self-contained prompt plus Lesson Pass JSON in any external voice chat, with L1 support fading from A1 to target-language immersion by the advanced levels.
 - **Browser apps** — flashcards, quizzes, assisted reader, replayable dictation and a progress dashboard. Self-contained HTML, served locally.
 - **Natural voices, free** — neural TTS via the cloud-based edge-tts service, no key or account. Browser/OS voices work locally; OpenAI and ElevenLabs are optional.
 - **Any native language, any target** — the tutor explains in *your* language; English ships complete, and other target languages are generated in place on request.
@@ -52,8 +52,8 @@ docs/                methodology, architecture, and the research behind them
 activities/          lesson procedures and the daily orchestrator (plain markdown)
 languages/english/   curriculum: 60 CEFR units + notes per native language
 apps/                browser apps: flashcards, quiz, reader, dictation, dashboard
-portable/            optional voice bridge for another voice AI
-tools/               srs.py (FSRS) · serve.py (local API) · tts.py (voices)
+portable/            external voice bridge and report contract
+tools/               SRS · local app server · TTS · voice-contract self-check
 student.example/     template for your data — your real student/ is gitignored
 ```
 
@@ -71,6 +71,7 @@ The most valuable contributions, in order:
 4. **Windows/Linux testing** — the tooling is cross-platform by design; field reports welcome.
 
 Keep the spirit: plain files, no frameworks, free by default, works in any agent.
+Before submitting voice-flow changes, run `python3 tools/voice_selfcheck.py`.
 
 ## License
 

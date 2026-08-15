@@ -9,7 +9,7 @@
 - **native_language:** — <!-- any language; the tutor explains and hints in this language -->
 - **learning:** english <!-- comma-separated if studying several -->
 - **daily_minutes:** 30 <!-- how long a session should be; the plan adapts to this -->
-- **voice_channel:** none <!-- codex_work | external | none; voice requires a separate task and the route is reused automatically -->
+- **voice_channel:** none <!-- external | none; each external voice activity gets a complete self-contained prompt -->
 - **tts_voice:** — <!-- optional; e.g. en-US-AndrewNeural. Tutor: export TUTOR_TTS_VOICE=<this> when starting serve.py/tts.py -->
 - **pronunciation_goal:** intelligible <!-- intelligible | native-like. Flips both ways; the tutor re-asks at the moments in methodology §6 -->
 - **goals:** — <!-- e.g. "work interviews", "travel", "pass B2 First" -->

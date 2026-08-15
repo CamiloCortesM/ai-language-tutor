@@ -15,7 +15,7 @@ Exam conditions: no hints, no corrections mid-paper, time limits stated per part
 1. **Reading (+ Use of English from B2)** — texts follow the known-words rule *for the level*, not for the learner (this is a test, not input).
 2. **Writing** — level task from `writing.md` table, scored with the CEFR rubric under exam strictness.
 3. **Listening** — spoken texts, questions after one play (two at A1–A2).
-4. **Speaking** — interview + picture/topic long turn + (B1+) discussion. Before handoff, write every prompt as a finite numbered plan in `portable/voice-tutor.md`, with observable completion for each and `closing: none`. Use the saved voice route. If it is unavailable, schedule this paper separately; the exam cannot gate the level and no typed substitute counts.
+4. **Speaking** — interview + picture/topic long turn + (B1+) discussion. Before handoff, write every prompt as a finite numbered plan in `portable/voice-tutor.md`; each response step completes after one good-faith learner answer, including “I don't know” or “skip”. Set `closing: none`. Use the saved voice route. If it is unavailable, schedule this paper separately; the exam cannot gate the level and no typed substitute counts.
 
 ## Scoring & verdict
 

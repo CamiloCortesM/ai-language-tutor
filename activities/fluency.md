@@ -8,7 +8,7 @@
 
 1. Learner picks (or you offer) an easy, personal topic: my family, my job, my last trip, my favorite show.
 2. 1 minute to think — **no notes**.
-3. Use the saved `voice_channel` and the `fluency` type in `portable/voice-tutor.md`. The finite plan is exactly: preparation, round 1, round 2, round 3. They give the same talk **4 → 3 → 2 minutes** (A1–A2: 2 → 1.5 → 1); set `closing: none` and give no corrections at any point.
+3. Use the saved `voice_channel` and the `fluency` type in `portable/voice-tutor.md`. The finite plan is exactly: preparation, round 1, round 2, round 3. Preparation completes when the learner says ready or skip. Each timed round completes only when its timer ends after the learner speaks, or the learner explicitly stops/skips; a short utterance alone does not complete it. They give the same talk **4 → 3 → 2 minutes** (A1–A2: 2 → 1.5 → 1); set `closing: none` and give no corrections at any point.
 4. Rounds back-to-back; the shrinking clock forces faster retrieval of the same content.
 
 After: point at fluency gains only ("round three had almost no pauses") — accuracy feedback and accuracy-error logging are off today by design.
