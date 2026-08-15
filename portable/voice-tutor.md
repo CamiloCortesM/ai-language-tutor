@@ -1,6 +1,6 @@
 # Voice Lesson Tutor — run finite spoken lessons in any voice AI
 
-Spoken lessons use the learner's saved `voice_channel`: voice in the current workspace, **Codex/Work voice** with direct write-back, or a custom voice project through a **Lesson Pass JSON** and **Lesson Report JSON**. Every route uses the same finite numbered plan.
+Spoken lessons use the learner's saved `voice_channel`: a separate **Codex/Work voice** task with direct write-back, or a custom voice project through a **Lesson Pass JSON** and **Lesson Report JSON**. Every route uses the same finite numbered plan.
 
 ## Codex/Work desktop voice — direct project write-back
 

@@ -16,7 +16,7 @@ Works with **Claude Code, Cowork, Codex, Cursor, OpenCode, Gemini CLI** — anyt
 - **Daily sessions** — one word (`session`) plans your day: spaced review, comprehensible reading, conversation, writing, pronunciation… balanced across the week and fitted to the minutes you have.
 - **Real curriculum** — 60 CEFR units for English (A1→C1): criterial grammar, vocabulary, functions and Cambridge-style level exams.
 - **Spaced repetition** — sentence-first cloze cards: retrieve a word or chunk inside a real sentence, then reveal its pronunciation, completed context, meaning and optional picture. Scheduled with FSRS and generated from *your* errors and readings.
-- **Speaking that counts** — normal lessons stay in text; conversation, fluency, pronunciation and spoken exams automatically use the voice route saved during setup. One finite controller supports the current workspace, Codex/Work and external voice projects.
+- **Speaking that counts** — normal lessons stay in text; conversation, fluency, pronunciation and spoken exams automatically use the voice route saved during setup. One finite controller supports separate Codex/Work voice tasks and external voice projects.
 - **Browser apps** — flashcards, quizzes, assisted reader, replayable dictation and a progress dashboard. Self-contained HTML, served locally.
 - **Natural voices, free** — neural TTS via the cloud-based edge-tts service, no key or account. Browser/OS voices work locally; OpenAI and ElevenLabs are optional.
 - **Any native language, any target** — the tutor explains in *your* language; English ships complete, and other target languages are generated in place on request.

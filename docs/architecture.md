@@ -82,7 +82,7 @@ Every activity declares a mode; the learner is never asked to choose text versus
 | `chat` | Interaction stays in text; app/TTS audio may supply listening material | SRS, reading, writing, grammar, quiz, precision listening |
 | `voice-required` | The learner must speak to a voice model | conversation at every level, pronunciation production, fluency, story/live listening, weekly/exam speaking |
 
-Setup stores one `voice_channel`: current workspace, Codex/Work or an external voice project. The tutor reuses it automatically for `voice-required` steps; the learner may override it explicitly. Both handoff routes use the same finite `STEP_N → optional CORRECTION → FINISHED` controller in `portable/voice-tutor.md`. With no available route, the step is deferred and `speaking_debt` is logged — typing never completes speaking.
+Setup stores one `voice_channel`: a separate Codex/Work voice task or an external voice project. The tutor reuses it automatically for `voice-required` steps; the learner may override it explicitly. Both handoff routes use the same finite `STEP_N → optional CORRECTION → FINISHED` controller in `portable/voice-tutor.md`. With no available route, the step is deferred and `speaking_debt` is logged — typing never completes speaking.
 
 The daily session plan shows each step's mode up front (e.g. 🎙️ = you will speak). Level-up exams always include the spoken paper — you cannot reach B1+ without demonstrated speaking.
 
